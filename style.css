@@ -1,0 +1,694 @@
+/* ==========================================================================
+   Design System & Variables
+   ========================================================================== */
+:root {
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --transition-fast: all 0.15s ease;
+    --font-ui: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Theme Defaults (Sepia / 和紙) */
+    --bg-app: #f5eedc;
+    --bg-card: #fdfaf2;
+    --bg-ui: rgba(253, 250, 242, 0.85);
+    --text-main: #2c221e;
+    --text-muted: #705f55;
+    --border-color: rgba(112, 95, 85, 0.15);
+    --accent-color: #a67c52;
+    --accent-hover: #8e623b;
+    --shadow-sm: 0 2px 8px rgba(44, 34, 30, 0.04);
+    --shadow-md: 0 8px 30px rgba(44, 34, 30, 0.08);
+    --shadow-lg: 0 16px 40px rgba(44, 34, 30, 0.12);
+    --ruby-color: #8c7667;
+    --scrollbar-track: rgba(112, 95, 85, 0.05);
+    --scrollbar-thumb: rgba(112, 95, 85, 0.2);
+}
+
+/* Theme: Light (明) */
+.theme-light {
+    --bg-app: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-ui: rgba(255, 255, 255, 0.85);
+    --text-main: #1a1a1a;
+    --text-muted: #666666;
+    --border-color: rgba(0, 0, 0, 0.08);
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
+    --ruby-color: #555555;
+    --scrollbar-track: rgba(0, 0, 0, 0.03);
+    --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+}
+
+/* Theme: Dark (暗) */
+.theme-dark {
+    --bg-app: #18181a;
+    --bg-card: #222225;
+    --bg-ui: rgba(34, 34, 37, 0.85);
+    --text-main: #e3e3e6;
+    --text-muted: #95959f;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --accent-color: #818cf8;
+    --accent-hover: #6366f1;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.4);
+    --ruby-color: #b0b0b8;
+    --scrollbar-track: rgba(255, 255, 255, 0.03);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+}
+
+/* Theme: Black (漆黒) */
+.theme-black {
+    --bg-app: #000000;
+    --bg-card: #121212;
+    --bg-ui: rgba(18, 18, 18, 0.85);
+    --text-main: #b8b8b8;
+    --text-muted: #6e6e6e;
+    --border-color: rgba(255, 255, 255, 0.05);
+    --accent-color: #a78bfa;
+    --accent-hover: #8b5cf6;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --ruby-color: #8a8a8a;
+    --scrollbar-track: rgba(255, 255, 255, 0.02);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Base Styles & Reset
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: var(--font-ui);
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   App Layout
+   ========================================================================== */
+.app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border: none;
+    outline: none;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    outline: none;
+}
+.btn-icon:hover {
+    background: var(--accent-color);
+    color: #ffffff;
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+.btn-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ==========================================================================
+   Welcome Screen (Start Panel)
+   ========================================================================== */
+.welcome-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.welcome-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 48px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.logo-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-main);
+}
+.logo-sub {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.description {
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 36px;
+    font-size: 15px;
+}
+
+/* Drag & Drop Zone */
+.drop-zone {
+    border: 2px dashed var(--accent-color);
+    border-radius: 12px;
+    padding: 40px 20px;
+    background: rgba(166, 124, 82, 0.02);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    margin-bottom: 36px;
+}
+.drop-zone.dragover {
+    background: rgba(166, 124, 82, 0.08);
+    transform: scale(1.02);
+    border-color: var(--accent-hover);
+}
+
+.drop-zone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.icon-upload {
+    width: 48px;
+    height: 48px;
+    color: var(--accent-color);
+    margin-bottom: 16px;
+}
+.drop-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+.drop-or {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 12px 0;
+}
+
+/* Help Section */
+.help-section {
+    text-align: left;
+    border-top: 1px solid var(--border-color);
+    padding-top: 24px;
+}
+.help-section h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+.help-section ol {
+    padding-left: 20px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+.help-section li {
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   Reader Screen
+   ========================================================================== */
+.reader-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+}
+
+/* Header UI */
+.reader-header {
+    height: 64px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-ui);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 8;
+    transition: transform 0.3s ease;
+}
+.reader-header.hidden {
+    transform: translateY(-100%);
+}
+
+.book-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+/* Viewport for reading text */
+.reader-viewport {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    padding: 40px 60px;
+    display: flex;
+    justify-content: flex-start;
+    /* CSS Scroll Snap for page alignment */
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    /* Chrome/Safari scrollbar hide */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* We want to make sure the scroll starts from the right side */
+.reader-viewport {
+    direction: ltr; /* keep scrollLeft direction logic consistent */
+}
+
+/* Book Content Container */
+.reader-content {
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    text-orientation: mixed;
+    -webkit-text-orientation: mixed;
+    
+    height: 100%;
+    /* Create multi-column layout for horizontal paging */
+    column-fill: auto;
+    column-gap: 80px; /* Space between pages */
+    
+    /* Apply scroll snap to columns */
+    scroll-snap-align: start;
+    
+    text-align: justify;
+    line-break: strict;
+    word-break: break-all;
+    
+    color: var(--text-main);
+    transition: font-size 0.3s ease, line-height 0.3s ease, letter-spacing 0.3s ease;
+}
+
+/* Set page column width to match viewport height-based ratio */
+@media (min-width: 768px) {
+    .reader-content {
+        column-width: 50vw; /* Column width takes half of the screen width */
+    }
+}
+@media (max-width: 767px) {
+    .reader-content {
+        column-width: 80vw; /* On smaller devices, make it almost full width */
+        column-gap: 40px;
+    }
+}
+
+/* Paragraph styling */
+.reader-content p {
+    text-indent: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0; /* Clear default block margin */
+}
+
+/* Aozora specific headings and styles */
+.reader-content h1, 
+.reader-content h2, 
+.reader-content h3, 
+.reader-content h4, 
+.reader-content h5 {
+    font-weight: 700;
+    margin-left: 1.5em; /* Spacing in vertical mode is left margin */
+    margin-right: 0.5em;
+    line-height: 1.2;
+    display: block;
+}
+.reader-content h1 { font-size: 1.8em; }
+.reader-content h2 { font-size: 1.5em; }
+.reader-content h3 { font-size: 1.3em; }
+
+/* Ruby tags */
+.reader-content ruby {
+    ruby-position: over; /* display right of text */
+}
+.reader-content rt {
+    font-size: 0.52em;
+    color: var(--ruby-color);
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+/* General cleanups */
+.reader-content div.main_body {
+    display: block;
+}
+.reader-content .jisage {
+    margin-top: 2em; /* shifts down (left margin in vertical is top margin equivalent for indentation) */
+}
+
+/* Typography styles */
+.font-mincho {
+    font-family: 'Noto Serif JP', 'Yu Mincho', YuMincho, 'Hiragino Mincho ProN', serif;
+    font-weight: 400;
+}
+.font-gothic {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    font-weight: 400;
+}
+
+/* Font Sizes */
+.size-sm { font-size: 14.5px; }
+.size-md { font-size: 17px; }
+.size-lg { font-size: 21px; }
+.size-xl { font-size: 25px; }
+
+/* Line Heights */
+.line-height-tight { line-height: 1.7; }
+.line-height-normal { line-height: 2.1; }
+.line-height-loose { line-height: 2.6; }
+
+/* Letter Spacings */
+.spacing-tight { letter-spacing: 0.03em; }
+.spacing-normal { letter-spacing: 0.08em; }
+.spacing-loose { letter-spacing: 0.16em; }
+
+/* ==========================================================================
+   Page Navigation Buttons (Overlay)
+   ========================================================================== */
+.page-nav {
+    position: absolute;
+    top: 64px;
+    bottom: 40px;
+    width: 20%;
+    max-width: 150px;
+    z-index: 6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    user-select: none;
+}
+.page-nav:hover {
+    opacity: 0.3;
+    background: linear-gradient(to right, rgba(0,0,0,0.02), rgba(0,0,0,0));
+}
+.page-nav-left {
+    left: 0;
+}
+.page-nav-right {
+    right: 0;
+}
+
+/* Adjust gradients for dark theme */
+.theme-dark .page-nav:hover,
+.theme-black .page-nav:hover {
+    background: linear-gradient(to right, rgba(255,255,255,0.01), rgba(255,255,255,0));
+}
+
+/* Footer UI */
+.reader-footer {
+    height: 40px;
+    background: var(--bg-ui);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-color);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 8;
+}
+
+.progress-bar-container {
+    flex: 1;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin-right: 24px;
+    overflow: hidden;
+}
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.2s ease;
+}
+
+.footer-info {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: flex;
+    gap: 16px;
+}
+
+/* ==========================================================================
+   Settings Drawer (Sidebar)
+   ========================================================================== */
+.settings-drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.settings-drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    height: 64px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+}
+.drawer-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.drawer-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.settings-group {
+    margin-bottom: 28px;
+}
+.settings-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Group Button Selectors */
+.theme-selector,
+.font-selector,
+.size-selector,
+.lh-selector,
+.spacing-selector {
+    display: grid;
+    grid-gap: 8px;
+}
+
+.theme-selector {
+    grid-template-columns: repeat(2, 1fr);
+}
+.font-selector {
+    grid-template-columns: 1fr;
+}
+.size-selector,
+.lh-selector,
+.spacing-selector {
+    grid-template-columns: repeat(3, 1fr);
+}
+.size-selector {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Drawer button styles */
+.theme-selector button,
+.font-selector button,
+.size-selector button,
+.lh-selector button,
+.spacing-selector button {
+    padding: 10px;
+    font-size: 14px;
+    background: var(--bg-app);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    transition: var(--transition-fast);
+}
+
+.theme-selector button:hover,
+.font-selector button:hover,
+.size-selector button:hover,
+.lh-selector button:hover,
+.spacing-selector button:hover {
+    border-color: var(--accent-color);
+    background: rgba(166, 124, 82, 0.05);
+}
+
+.theme-selector button.active,
+.font-selector button.active,
+.size-selector button.active,
+.lh-selector button.active,
+.spacing-selector button.active {
+    background: var(--accent-color);
+    color: #ffffff;
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Specific Theme Button Previews */
+.theme-btn-sepia { border-left: 4px solid #a67c52 !important; }
+.theme-btn-light { border-left: 4px solid #4f46e5 !important; }
+.theme-btn-dark { border-left: 4px solid #818cf8 !important; }
+.theme-btn-black { border-left: 4px solid #a78bfa !important; }
+
+/* Backdrop Overlay */
+.drawer-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+.drawer-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   Utility Classes & Animations
+   ========================================================================== */
+.hidden {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar customize for reading viewport */
+.reader-viewport::-webkit-scrollbar {
+    height: 6px;
+}
+.reader-viewport::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+.reader-viewport::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 3px;
+}
+.reader-viewport::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-color);
+}

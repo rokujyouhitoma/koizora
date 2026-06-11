@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コイゾラ - 青空文庫縦書きビューアー</title>
+    <!-- Google Fonts: Noto Serif JP for elegant mincho, and Outfit/Inter for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Outfit:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-sepia">
+    <!-- UI Layout -->
+    <div id="app" class="app-container">
+        
+        <!-- Welcome Screen (Shown when no file is loaded) -->
+        <div id="welcome-screen" class="welcome-screen">
+            <div class="welcome-card">
+                <div class="logo">
+                    <span class="logo-text">コイゾラ</span>
+                    <span class="logo-sub">青空文庫 縦書きビューアー</span>
+                </div>
+                
+                <p class="description">
+                    青空文庫のテキストファイル（.txt）やXHTMLファイル（.html）をドロップするだけで、美しい縦書き表示に変換し、快適に読書ができるビューアーです。
+                </p>
+
+                <!-- File Drop Area -->
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <svg class="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+                        <p class="drop-text">ファイルをここにドラッグ＆ドロップ</p>
+                        <span class="drop-or">または</span>
+                        <label class="btn btn-primary">
+                            ファイルを選択
+                            <input type="file" id="file-input" accept=".txt,.html,.xhtml" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3>宮本武蔵を読むには？</h3>
+                    <ol>
+                        <li>青空文庫の<a href="https://www.aozora.gr.jp/cards/001562/card52410.html" target="_blank" rel="noopener">「宮本武蔵 01 序」の図書カード</a>などにアクセスします。</li>
+                        <li>「ファイルのダウンロード」項目から<strong>「テキストファイル(ルビあり)」</strong>または<strong>「HTMLファイル(XHTML版)」</strong>をダウンロードします。</li>
+                        <li>ダウンロードしたファイル（zipの場合は解凍したテキストファイル）をこの画面にドロップしてください。</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reader Screen (Shown when a file is loaded) -->
+        <div id="reader-screen" class="reader-screen hidden">
+            <!-- Top Controls (Auto-hides) -->
+            <header class="reader-header">
+                <button id="btn-back" class="btn-icon" title="本を閉じる">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+                <div id="book-title" class="book-title">宮本武蔵</div>
+                <div class="right-controls">
+                    <button id="btn-settings" class="btn-icon" title="表示設定">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Reading Container -->
+            <main id="reader-viewport" class="reader-viewport">
+                <!-- Book content wrapper. Scrolled horizontally. -->
+                <article id="reader-content" class="reader-content font-mincho size-md spacing-normal line-height-normal">
+                    <!-- Parsed HTML content will go here -->
+                </article>
+            </main>
+
+            <!-- Navigation overlay buttons (click left/right side to turn page) -->
+            <div id="page-nav-left" class="page-nav page-nav-left" title="次のページへ"></div>
+            <div id="page-nav-right" class="page-nav page-nav-right" title="前のページへ"></div>
+
+            <!-- Bottom Progress bar -->
+            <footer class="reader-footer">
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <div class="footer-info">
+                    <span id="reading-percentage">0%</span>
+                    <span id="reading-index">1 / 1 ページ</span>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Settings Sidebar (Drawer) -->
+        <div id="settings-drawer" class="settings-drawer hidden">
+            <div class="drawer-header">
+                <h2>表示設定</h2>
+                <button id="btn-close-settings" class="btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="drawer-content">
+                <!-- Theme Option -->
+                <div class="settings-group">
+                    <label>背景色とテーマ</label>
+                    <div class="theme-selector">
+                        <button class="theme-btn theme-btn-sepia active" data-theme="sepia">和紙</button>
+                        <button class="theme-btn theme-btn-light" data-theme="light">明</button>
+                        <button class="theme-btn theme-btn-dark" data-theme="dark">暗</button>
+                        <button class="theme-btn theme-btn-black" data-theme="black">漆黒</button>
+                    </div>
+                </div>
+
+                <!-- Font Family -->
+                <div class="settings-group">
+                    <label>書体</label>
+                    <div class="font-selector">
+                        <button class="font-btn active" data-font="font-mincho">明朝体 (読書向き)</button>
+                        <button class="font-btn" data-font="font-gothic">ゴシック体</button>
+                    </div>
+                </div>
+
+                <!-- Font Size -->
+                <div class="settings-group">
+                    <label>文字サイズ</label>
+                    <div class="size-selector">
+                        <button class="size-btn" data-size="size-sm">小</button>
+                        <button class="size-btn active" data-size="size-md">中</button>
+                        <button class="size-btn" data-size="size-lg">大</button>
+                        <button class="size-btn" data-size="size-xl">特大</button>
+                    </div>
+                </div>
+
+                <!-- Line Height -->
+                <div class="settings-group">
+                    <label>行間</label>
+                    <div class="lh-selector">
+                        <button class="lh-btn" data-lh="line-height-tight">狭い</button>
+                        <button class="lh-btn active" data-lh="line-height-normal">標準</button>
+                        <button class="lh-btn" data-lh="line-height-loose">広い</button>
+                    </div>
+                </div>
+
+                <!-- Letter Spacing -->
+                <div class="settings-group">
+                    <label>文字間</label>
+                    <div class="spacing-selector">
+                        <button class="spacing-btn" data-spacing="spacing-tight">狭い</button>
+                        <button class="spacing-btn active" data-spacing="spacing-normal">標準</button>
+                        <button class="spacing-btn" data-spacing="spacing-loose">広い</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay backdrop for settings drawer -->
+        <div id="drawer-overlay" class="drawer-overlay hidden"></div>
+        
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
