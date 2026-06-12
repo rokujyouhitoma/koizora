@@ -157,7 +157,7 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
 - **最大スクロール幅 (`maxScroll`)**: 
   $$\text{maxScroll} = \text{scrollWidth} - \text{clientWidth}$$
 - **現在の絶対スクロール位置 (`currentScroll`)**:
-  RTL（Right-to-Left）書字方向において、`scrollLeft` は `0` (右端) から負の値 (左端に向かってマイナス) に減少します。そのため、計算時には絶対値を使用します。
+  RTL（Right-to-Left）書字方向において、`scrollLeft` は `0` (右端) から負の値 (左端に向かってマイナス) に減少します。LTR（Left-to-Right）書字方向においては、`scrollLeft` は `0` (左端) から正の値 (右端に向かってプラス) に増加します。絶対値を使用することで、双方の進行状況を共通の計算式で算出します。
   $$\text{currentScroll} = \left| \text{scrollLeft} \right|$$
 - **読了進捗率 (`bookmarkProgress`)**:
   $$\text{bookmarkProgress} = \frac{\text{currentScroll}}{\text{maxScroll}} \quad (0.0 \le \text{bookmarkProgress} \le 1.0)$$
@@ -165,28 +165,28 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
   $$\text{pageCount} = \text{round}\left( \frac{\text{scrollWidth}}{\text{clientWidth}} \right)$$
 - **現在ページ番号 (`currentPage`)**:
   $$\text{currentPage} = \text{round}\left( \frac{\text{currentScroll}}{\text{clientWidth}} \right) + 1$$
+- **進捗バークリック位置からの進捗率算出**:
+  $$\text{bookmarkProgress} = \frac{\text{clientX} - \text{rect.left}}{\text{rect.width}}$$
+- **指定ページジャンプからの進捗率算出**:
+  $$\text{bookmarkProgress} = \frac{\text{targetPage} - 1}{\text{pageCount} - 1} \quad (\text{if pageCount} > 1)$$
 
 ### 3.2 ページ送り（ナビゲーション）
-縦書きの進行方向（RTL）に対応するため、左右ナビゲーションボタンおよびキーボード操作の方向は以下の挙動をとります。
+設定されている読書方向（`config.direction`）に応じて、画面タップエリア、キーボード矢印キー、およびスクロール方向が連動して変化します。
 
-- **次のページへ進む (画面左側のクリック / 左矢印キー)**:
-  スクロール方向を左に進めるため、負の方向にスクロールします。
-  $$\text{scrollLeft} \leftarrow \text{scrollLeft} - \text{clientWidth}$$
-  (JS: `readerViewport.scrollBy({ left: -clientWidth, behavior: 'smooth' })`)
-- **前のページへ戻る (画面右側のクリック / 右矢印キー)**:
-  スクロール方向を右に戻すため、正の方向にスクロールします。
-  $$\text{scrollLeft} \leftarrow \text{scrollLeft} + \text{clientWidth}$$
-  (JS: `readerViewport.scrollBy({ left: clientWidth, behavior: 'smooth' })`)
+* **右から左（RTL）時のページめくり方向**:
+  * **次ページ（左方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} - \text{clientWidth}$ (左へスクロール)
+  * **前ページ（右方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} + \text{clientWidth}$ (右へスクロール)
+* **左から右（LTR）時のページめくり方向**:
+  * **次ページ（右方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} + \text{clientWidth}$ (右へスクロール)
+  * **前ページ（左方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} - \text{clientWidth}$ (左へスクロール)
 
-### 3.3 リサイズ・フォントサイズ変更時のレイアウト維持
-ウィンドウサイズ変更時やフォントサイズが変更されると、段組み全体の `scrollWidth` や `clientWidth` が変化し、現在の表示位置がズレてしまいます。コイゾラでは、変更直後に進捗率を用いてスクロール位置を正確に再計算・復元します。
-```javascript
-function restoreScrollPosition() {
-    const maxScroll = readerViewport.scrollWidth - readerViewport.clientWidth;
-    // 負のスクロール位置を計算して適用
-    readerViewport.scrollLeft = -(bookmarkProgress * maxScroll);
-}
-```
+### 3.3 レイアウト変更時の位置復元とリフロー保護 (`isReflowing`)
+リサイズやフォントサイズ、読書方向の変更時には、段組み寸法が変化して一時的に不規則なスクロールイベントが発生します。これを無視し元の位置を正確に維持するため、`isReflowing` 状態フラグで制御を行います。
+1. 表示パラメータ変更前に `isReflowing = true` に設定。
+2. スクロールイベントハンドラーは `isReflowing === true` の間、`bookmarkProgress` の上書きを行わない。
+3. リフローの完了を待って（`setTimeout`）、以下の式でスクロール位置を復元したのち `isReflowing = false` に戻す。
+
+$$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \text{maxScroll}) & (\text{RTL時}) \\ \text{bookmarkProgress} \times \text{maxScroll} & (\text{LTR時}) \end{cases}$$
 
 ---
 
@@ -202,6 +202,7 @@ function restoreScrollPosition() {
   {
     "theme": "sepia",
     "font": "font-mincho",
+    "direction": "rtl",
     "size": "size-md",
     "lh": "line-height-normal",
     "spacing": "spacing-normal"

@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Controls & Navigation
     const btnBack = document.getElementById('btn-back');
     const btnSettings = document.getElementById('btn-settings');
+    const btnFirstPage = document.getElementById('btn-first-page');
     const btnCloseSettings = document.getElementById('btn-close-settings');
     const settingsDrawer = document.getElementById('settings-drawer');
     const drawerOverlay = document.getElementById('drawer-overlay');
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const readerHeader = document.querySelector('.reader-header');
     
     // Progress
+    const progressBarContainer = document.querySelector('.progress-bar-container');
     const progressBar = document.getElementById('progress-bar');
     const readingPercentage = document.getElementById('reading-percentage');
     const readingIndex = document.getElementById('reading-index');
@@ -52,11 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFileType = ''; // 'txt' or 'html'
     let bookmarkProgress = 0; // 0 to 1 scroll percentage
     let headerTimeout = null;
+    let isReflowing = false;
 
     // Viewport layout configurations
     const config = {
         theme: 'sepia',
         font: 'font-mincho',
+        direction: 'rtl',
         size: 'size-md',
         lh: 'line-height-normal',
         spacing: 'spacing-normal'
@@ -111,9 +115,71 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = 'コイゾラ - 青空文庫縦書きビューアー';
     });
 
+    // First Page Navigation
+    if (btnFirstPage) {
+        btnFirstPage.addEventListener('click', () => {
+            bookmarkProgress = 0;
+            restoreScrollPositionSmooth();
+            updateProgress();
+            saveBookmark();
+        });
+    }
+
+    // Progress Bar click to jump
+    if (progressBarContainer) {
+        progressBarContainer.addEventListener('click', (e) => {
+            const rect = progressBarContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickProgress = Math.min(1, Math.max(0, clickX / rect.width));
+            
+            bookmarkProgress = clickProgress;
+            restoreScrollPositionSmooth();
+            updateProgress();
+            saveBookmark();
+        });
+    }
+
+    // Page number specify jump
+    if (readingIndex) {
+        readingIndex.title = "クリックしてページ移動";
+        readingIndex.addEventListener('click', () => {
+            const clientWidth = readerViewport.clientWidth;
+            const scrollWidth = readerViewport.scrollWidth;
+            const pageCount = Math.round(scrollWidth / clientWidth);
+            
+            const targetPageStr = prompt(`移動先ページ番号を入力してください (1 〜 ${pageCount}):`);
+            if (targetPageStr === null) return; // cancelled
+            
+            const targetPage = parseInt(targetPageStr, 10);
+            if (isNaN(targetPage) || targetPage < 1 || targetPage > pageCount) {
+                alert("正しくないページ番号です。");
+                return;
+            }
+            
+            const newProgress = pageCount > 1 ? (targetPage - 1) / (pageCount - 1) : 0;
+            
+            bookmarkProgress = newProgress;
+            restoreScrollPositionSmooth();
+            updateProgress();
+            saveBookmark();
+        });
+    }
+
     // Navigation Buttons
-    pageNavLeft.addEventListener('click', nextPage);   // Left click goes forward (RTL)
-    pageNavRight.addEventListener('click', prevPage);  // Right click goes backward
+    pageNavLeft.addEventListener('click', () => {
+        if (config.direction === 'rtl') {
+            nextPage(); // Left goes forward in RTL
+        } else {
+            prevPage(); // Left goes backward in LTR
+        }
+    });
+    pageNavRight.addEventListener('click', () => {
+        if (config.direction === 'rtl') {
+            prevPage(); // Right goes backward in RTL
+        } else {
+            nextPage(); // Right goes forward in LTR
+        }
+    });
 
     // Scroll & Window Resize Events
     let scrollSaveTimeout = null;
@@ -131,10 +197,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
         if (readerScreen.classList.contains('hidden')) return;
-        if (e.key === 'ArrowLeft') {
-            nextPage(); // RTL: left is forward
-        } else if (e.key === 'ArrowRight') {
-            prevPage(); // RTL: right is backward
+        if (config.direction === 'rtl') {
+            if (e.key === 'ArrowLeft') {
+                nextPage(); // RTL: left is forward
+            } else if (e.key === 'ArrowRight') {
+                prevPage(); // RTL: right is backward
+            }
+        } else {
+            if (e.key === 'ArrowRight') {
+                nextPage(); // LTR: right is forward
+            } else if (e.key === 'ArrowLeft') {
+                prevPage(); // LTR: left is backward
+            }
         }
     });
 
@@ -270,10 +344,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Wait a tick for rendering to complete before restoring scroll position
+        isReflowing = true;
         setTimeout(() => {
             restoreScrollPosition();
             updateProgress();
             triggerHeaderShow();
+            setTimeout(() => {
+                isReflowing = false;
+            }, 50);
         }, 100);
     }
 
@@ -412,6 +490,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Scrolling, Paging, and Bookmarks
     // ==========================================================================
     function handleScroll() {
+        if (isReflowing) return;
+        
         const maxScroll = readerViewport.scrollWidth - readerViewport.clientWidth;
         
         if (maxScroll <= 0) return;
@@ -444,29 +524,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function restoreScrollPosition() {
         const maxScroll = readerViewport.scrollWidth - readerViewport.clientWidth;
-        // In vertical-rl, scrolling forward is in the negative direction.
-        readerViewport.scrollLeft = -(bookmarkProgress * maxScroll);
+        if (config.direction === 'rtl') {
+            // In vertical-rl, scrolling forward is in the negative direction.
+            readerViewport.scrollLeft = -(bookmarkProgress * maxScroll);
+        } else {
+            // In vertical-lr, scrolling forward is in the positive direction.
+            readerViewport.scrollLeft = bookmarkProgress * maxScroll;
+        }
+    }
+
+    function restoreScrollPositionSmooth() {
+        const maxScroll = readerViewport.scrollWidth - readerViewport.clientWidth;
+        const targetScroll = config.direction === 'rtl' ? -(bookmarkProgress * maxScroll) : (bookmarkProgress * maxScroll);
+        readerViewport.scrollTo({ left: targetScroll, behavior: 'smooth' });
     }
 
     function nextPage() {
-        // Forward in RTL layout means scrolling Left (negative direction)
         const amount = readerViewport.clientWidth;
-        readerViewport.scrollBy({ left: -amount, behavior: 'smooth' });
+        if (config.direction === 'rtl') {
+            // Forward in RTL layout means scrolling Left (negative direction)
+            readerViewport.scrollBy({ left: -amount, behavior: 'smooth' });
+        } else {
+            // Forward in LTR layout means scrolling Right (positive direction)
+            readerViewport.scrollBy({ left: amount, behavior: 'smooth' });
+        }
         triggerHeaderShow();
     }
 
     function prevPage() {
-        // Backward in RTL layout means scrolling Right (positive direction)
         const amount = readerViewport.clientWidth;
-        readerViewport.scrollBy({ left: amount, behavior: 'smooth' });
+        if (config.direction === 'rtl') {
+            // Backward in RTL layout means scrolling Right (positive direction)
+            readerViewport.scrollBy({ left: amount, behavior: 'smooth' });
+        } else {
+            // Backward in LTR layout means scrolling Left (negative direction)
+            readerViewport.scrollBy({ left: -amount, behavior: 'smooth' });
+        }
         triggerHeaderShow();
     }
 
     function handleResize() {
         // Layout columns width changes, so we must restore scroll position based on percentage
         if (!readerScreen.classList.contains('hidden')) {
+            isReflowing = true;
             restoreScrollPosition();
             updateProgress();
+            setTimeout(() => {
+                isReflowing = false;
+            }, 150);
         }
     }
 
@@ -509,29 +614,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Font Family
         setupButtonGroup('.font-selector button', 'font', (val) => {
+            isReflowing = true;
             readerContent.classList.remove('font-mincho', 'font-gothic');
             readerContent.classList.add(val);
+            setTimeout(() => {
+                restoreScrollPosition();
+                updateProgress();
+                isReflowing = false;
+            }, 150);
+        });
+
+        // Reading Direction
+        setupButtonGroup('.direction-selector button', 'direction', (val) => {
+            isReflowing = true;
+            readerContent.classList.remove('direction-rtl', 'direction-ltr');
+            readerContent.classList.add(`direction-${val}`);
+            
+            // Adjust overlay title tooltips dynamically
+            if (val === 'rtl') {
+                pageNavLeft.title = "次のページへ";
+                pageNavRight.title = "前のページへ";
+            } else {
+                pageNavLeft.title = "前のページへ";
+                pageNavRight.title = "次のページへ";
+            }
+            
+            setTimeout(() => {
+                restoreScrollPosition();
+                updateProgress();
+                isReflowing = false;
+            }, 150);
         });
 
         // Font Size
         setupButtonGroup('.size-selector button', 'size', (val) => {
+            isReflowing = true;
             readerContent.classList.remove('size-sm', 'size-md', 'size-lg', 'size-xl');
             readerContent.classList.add(val);
-            setTimeout(restoreScrollPosition, 50); // Recalculate columns scroll position
+            setTimeout(() => {
+                restoreScrollPosition();
+                updateProgress();
+                isReflowing = false;
+            }, 150);
         });
 
         // Line Height
         setupButtonGroup('.lh-selector button', 'lh', (val) => {
+            isReflowing = true;
             readerContent.classList.remove('line-height-tight', 'line-height-normal', 'line-height-loose');
             readerContent.classList.add(val);
-            setTimeout(restoreScrollPosition, 50);
+            setTimeout(() => {
+                restoreScrollPosition();
+                updateProgress();
+                isReflowing = false;
+            }, 150);
         });
 
         // Letter Spacing
         setupButtonGroup('.spacing-selector button', 'spacing', (val) => {
+            isReflowing = true;
             readerContent.classList.remove('spacing-tight', 'spacing-normal', 'spacing-loose');
             readerContent.classList.add(val);
-            setTimeout(restoreScrollPosition, 50);
+            setTimeout(() => {
+                restoreScrollPosition();
+                updateProgress();
+                isReflowing = false;
+            }, 150);
         });
     }
 
@@ -571,12 +719,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.className = '';
         document.body.classList.add(`theme-${config.theme}`);
 
+        // Update CSS direction dynamically to align scroll origin with text flow direction
+        readerViewport.style.direction = config.direction;
+
         readerContent.className = 'reader-content';
-        readerContent.classList.add(config.font, config.size, config.lh, config.spacing);
+        readerContent.classList.add(config.font, `direction-${config.direction}`, config.size, config.lh, config.spacing);
+
+        // Update navigation overlays page titles based on direction
+        if (config.direction === 'rtl') {
+            pageNavLeft.title = "次のページへ";
+            pageNavRight.title = "前のページへ";
+        } else {
+            pageNavLeft.title = "前のページへ";
+            pageNavRight.title = "次のページへ";
+        }
 
         // Update Button States in Drawer UI
         syncButtonState('.theme-selector button', 'theme', config.theme);
         syncButtonState('.font-selector button', 'font', config.font);
+        syncButtonState('.direction-selector button', 'direction', config.direction);
         syncButtonState('.size-selector button', 'size', config.size);
         syncButtonState('.lh-selector button', 'lh', config.lh);
         syncButtonState('.spacing-selector button', 'spacing', config.spacing);

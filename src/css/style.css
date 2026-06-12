@@ -446,10 +446,18 @@ a:hover {
     direction: ltr; /* keep scrollLeft direction logic consistent */
 }
 
-/* Book Content Container */
-.reader-content {
+/* Writing modes / flow direction */
+.direction-rtl {
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
+}
+.direction-ltr {
+    writing-mode: vertical-lr;
+    -webkit-writing-mode: vertical-lr;
+}
+
+/* Book Content Container */
+.reader-content {
     text-orientation: mixed;
     -webkit-text-orientation: mixed;
     
@@ -602,11 +610,16 @@ a:hover {
 
 .progress-bar-container {
     flex: 1;
-    height: 4px;
+    height: 8px;
     background: var(--border-color);
-    border-radius: 2px;
+    border-radius: 4px;
     margin-right: 24px;
     overflow: hidden;
+    cursor: pointer;
+    transition: height 0.15s ease;
+}
+.progress-bar-container:hover {
+    height: 12px;
 }
 .progress-bar {
     width: 0%;
@@ -621,6 +634,14 @@ a:hover {
     color: var(--text-muted);
     display: flex;
     gap: 16px;
+}
+#reading-index {
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+#reading-index:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -680,6 +701,7 @@ a:hover {
 /* Group Button Selectors */
 .theme-selector,
 .font-selector,
+.direction-selector,
 .size-selector,
 .lh-selector,
 .spacing-selector {
@@ -687,7 +709,8 @@ a:hover {
     grid-gap: 8px;
 }
 
-.theme-selector {
+.theme-selector,
+.direction-selector {
     grid-template-columns: repeat(2, 1fr);
 }
 .font-selector {
@@ -705,6 +728,7 @@ a:hover {
 /* Drawer button styles */
 .theme-selector button,
 .font-selector button,
+.direction-selector button,
 .size-selector button,
 .lh-selector button,
 .spacing-selector button {
@@ -721,6 +745,7 @@ a:hover {
 
 .theme-selector button:hover,
 .font-selector button:hover,
+.direction-selector button:hover,
 .size-selector button:hover,
 .lh-selector button:hover,
 .spacing-selector button:hover {
@@ -730,6 +755,7 @@ a:hover {
 
 .theme-selector button.active,
 .font-selector button.active,
+.direction-selector button.active,
 .size-selector button.active,
 .lh-selector button.active,
 .spacing-selector button.active {
