@@ -1,6 +1,6 @@
 # 基本設計書 (High-Level Design) - コイゾラ (Koizora)
 
-本ドキュメントは、要件定義書（[system_requirements.md](file:///workspace/koizora/docs/system_requirements.md)）に規定されたシステム要件に基づき、青空文庫縦書きビューアー「コイゾラ (Koizora)」の基本設計（High-Level Design）を定義します。
+本ドキュメントは、要件定義書（[system_requirements.md](/docs/system_requirements.md)）に規定されたシステム要件に基づき、青空文庫縦書きビューアー「コイゾラ (Koizora)」の基本設計（High-Level Design）を定義します。
 
 ---
 
@@ -38,17 +38,17 @@ graph TD
 
 | レイヤー / コンポーネント | 技術・ファイル名 | 役割と責務 |
 | :--- | :--- | :--- |
-| **表示レイヤー (View)** | [index.html](file:///workspace/koizora/index.html)<br>[style.css](file:///workspace/koizora/style.css) | ユーザーインターフェースの構造定義およびスタイリング。縦書き表示レイアウトの提供、各種設定パネル（ドロワー）およびウェルカム画面の構築。 |
-| **制御レイヤー (Controller)** | [app.js](file:///workspace/koizora/app.js) | ファイル読み込み、Shift_JISデコード、青空文庫記法のパース、表示設定の動的適用、スクロール進捗率の計算、LocalStorageとの連携等のアプリケーションロジック。 |
+| **表示レイヤー (View)** | [index.html](/index.html)<br>[style.css](/style.css) | ユーザーインターフェースの構造定義およびスタイリング。縦書き表示レイアウトの提供、各種設定パネル（ドロワー）およびウェルカム画面の構築。 |
+| **制御レイヤー (Controller)** | [app.js](/app.js) | ファイル読み込み、Shift_JISデコード、青空文庫記法のパース、表示設定の動的適用、スクロール進捗率の計算、LocalStorageとの連携等のアプリケーションロジック。 |
 | **永続化レイヤー (Storage)** | `localStorage` | セッションを跨いだユーザー設定（テーマ、フォントサイズ等）およびしおり情報（読了進捗率、最後に読んだファイルの内容・メタデータ）の永続化。 |
 
 ### 1.3 アーキテクチャドメインとADR（意思決定記録）の位置づけ
 * **TOGAF EA との位置づけ**:
   本ドキュメントは、**TOGAF EA** の「アプリケーションアーキテクチャ (AA)」「データアーキテクチャ (DA)」「テクノロジーアーキテクチャ (TA)」における**論理（概念）設計**を定義します。各レイヤーの境界、画面遷移、カラー変数名などを論理的に規定します。
 * **ADR (Architecture Decision Record) との連携**:
-  本基本設計に至る過程で議論・策定された、Vanilla JSの選定、CSSマルチカラムの採用、セッション復元の持ち方などの重要なアーキテクチャ意思決定は、[docs/adr/](file:///workspace/koizora/docs/adr/) 配下に個別のドキュメントとして記録・管理されます。
+  本基本設計に至る過程で議論・策定された、Vanilla JSの選定、CSSマルチカラムの採用、セッション復元の持ち方などの重要なアーキテクチャ意思決定は、[docs/adr/](/docs/adr/) 配下に個別のドキュメントとして記録・管理されます。
 * **設計ドキュメント間のすみ分け**:
-  要件定義（SRD）や詳細設計（LLD）との境界、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](file:///workspace/koizora/docs/document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
+  要件定義（SRD）や詳細設計（LLD）との境界、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](/docs/document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
 
 ---
 

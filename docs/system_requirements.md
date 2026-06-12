@@ -2,7 +2,7 @@
 
 ## 1. はじめに (Introduction)
 ### 1.1 目的
-本ドキュメント（要件定義書）は、要求定義書（[user_requirements.md](file:///workspace/koizora/docs/user_requirements.md)）で定義されたユーザー要求をシステム要件に翻訳したものです。開発プロセスにおける **TOGAF EA** の情報システムアーキテクチャおよびテクノロジーアーキテクチャの要件定義に相当します。
+本ドキュメント（要件定義書）は、要求定義書（[user_requirements.md](/docs/user_requirements.md)）で定義されたユーザー要求をシステム要件に翻訳したものです。開発プロセスにおける **TOGAF EA** の情報システムアーキテクチャおよびテクノロジーアーキテクチャの要件定義に相当します。
 
 ---
 

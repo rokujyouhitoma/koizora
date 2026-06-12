@@ -18,12 +18,12 @@
 
 | 文書名 | ファイルパス | 目的 (Purpose) | 想定読者 (Audience) | 作成・更新主担当 | 更新契機 (Trigger) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **開発プロセス定義書** | [development_process.md](file:///workspace/koizora/docs/development_process.md) | プロジェクトの開発ライフサイクル、各工程の作業定義、担当者、および成果物の追跡性を定義する。 | 開発チーム、人間（User）、AI Agent | 開発手法やプロセス方針を変更した時 |
-| **文書管理・ドキュメント台帳** | [document_ledger.md](file:///workspace/koizora/docs/document_ledger.md) | 管理対象ドキュメントの目的・担当、および設計書間のすみ分け・分掌ルールを定義する。 | 開発チーム、人間（User）、AI Agent | 管理対象ドキュメントの追加・削除、すみ分け方針の変更時 |
-| **要求定義書** | [user_requirements.md](file:///workspace/koizora/docs/user_requirements.md) | ユーザーの目的、必須対応作品、ユースケースなどのビジネス上の「要求（URD）」を定義する。 | 人間（User）、AI Agent | ユーザー要求の変更、動作保証作品の追加・変更時 |
-| **要件定義書** | [system_requirements.md](file:///workspace/koizora/docs/system_requirements.md) | システム概要、対応フォーマット、および機能・非機能的な「要件（SRD）」を定義する。 | 開発チーム、AI Agent | システムに対する機能・非機能要件の追加・変更時 |
-| **基本設計書 (HLD)** | [high_level_design.md](file:///workspace/koizora/docs/high_level_design.md) | システムアーキテクチャ、コンポーネント役割、画面遷移、デザインシステム等の論理的な設計を定義する。 | 開発チーム、AI Agent | システムアーキテクチャの変更、UIコンポーネント構成の変更時 |
-| **詳細設計書 (LLD)** | [low_level_design.md](file:///workspace/koizora/docs/low_level_design.md) | 関数仕様、変数、正規表現、ページ計算数式、データスキーマ等の実装に直結する物理設計を定義する。 | 実装担当エージェント、開発者 | コーディング仕様の変更、アルゴリズムの追加・変更時 |
+| **開発プロセス定義書** | [development_process.md](/docs/development_process.md) | プロジェクトの開発ライフサイクル、各工程の作業定義、担当者、および成果物の追跡性を定義する。 | 開発チーム、人間（User）、AI Agent | 開発手法やプロセス方針を変更した時 |
+| **文書管理・ドキュメント台帳** | [document_ledger.md](/docs/document_ledger.md) | 管理対象ドキュメントの目的・担当、および設計書間のすみ分け・分掌ルールを定義する。 | 開発チーム、人間（User）、AI Agent | 管理対象ドキュメントの追加・削除、すみ分け方針の変更時 |
+| **要求定義書** | [user_requirements.md](/docs/user_requirements.md) | ユーザーの目的、必須対応作品、ユースケースなどのビジネス上の「要求（URD）」を定義する。 | 人間（User）、AI Agent | ユーザー要求の変更、動作保証作品の追加・変更時 |
+| **要件定義書** | [system_requirements.md](/docs/system_requirements.md) | システム概要、対応フォーマット、および機能・非機能的な「要件（SRD）」を定義する。 | 開発チーム、AI Agent | システムに対する機能・非機能要件の追加・変更時 |
+| **基本設計書 (HLD)** | [high_level_design.md](/docs/high_level_design.md) | システムアーキテクチャ、コンポーネント役割、画面遷移、デザインシステム等の論理的な設計を定義する。 | 開発チーム、AI Agent | システムアーキテクチャの変更、UIコンポーネント構成の変更時 |
+| **詳細設計書 (LLD)** | [low_level_design.md](/docs/low_level_design.md) | 関数仕様、変数、正規表現、ページ計算数式、データスキーマ等の実装に直結する物理設計を定義する。 | 実装担当エージェント、開発者 | コーディング仕様の変更、アルゴリズムの追加・変更時 |
 | **アーキテクチャ意思決定記録** | `docs/adr/*.md` | 重要な設計・技術的トレードオフに関する意思決定とその背景、結果を記録する。 | 開発チーム、将来の開発者、AI Agent | 重要な技術選定、アーキテクチャ上の決定を下した時 |
 
 ---
@@ -50,7 +50,7 @@
   * 設計は**「その要件を技術的にどう解決するか（How the system solves it）」**を定義します。
 * **分掌の競合解決ルール**:
   * 実装や検証の過程で要件定義（SRD）と設計（HLD/LLD）の間に矛盾が発覚した場合、**「要件定義（SRD）が上位」**となります。
-  * 設計側の都合で要件を変更する場合は、まず [system_requirements.md](file:///workspace/koizora/docs/system_requirements.md) の変更履歴（要件変更プロセス）を経て要件を改定したのち、設計書（HLD/LLD）をそれに追従させます。
+  * 設計側の都合で要件を変更する場合は、まず [system_requirements.md](/docs/system_requirements.md) の変更履歴（要件変更プロセス）を経て要件を改定したのち、設計書（HLD/LLD）をそれに追従させます。
 
 ### 3.3 TOGAF EA ドメイン間のすみ分け
 TOGAF EA の4ドメイン（BA, AA, DA, TA）に沿った記述のオーバーラップは、以下のマトリクスに基づき、ドキュメントの目的ごとに分担（分掌）します。
