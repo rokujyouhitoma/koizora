@@ -126,17 +126,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Progress Bar click to jump
+    // Progress Bar drag/scrub to jump
+    let isDraggingProgress = false;
+
+    function handleProgressScrub(clientX) {
+        const rect = progressBarContainer.getBoundingClientRect();
+        const clickX = clientX - rect.left;
+        const clickProgress = Math.min(1, Math.max(0, clickX / rect.width));
+        
+        bookmarkProgress = clickProgress;
+        restoreScrollPosition(); // Instant feedback for real-time scrub
+        updateProgress();
+    }
+
     if (progressBarContainer) {
-        progressBarContainer.addEventListener('click', (e) => {
-            const rect = progressBarContainer.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickProgress = Math.min(1, Math.max(0, clickX / rect.width));
-            
-            bookmarkProgress = clickProgress;
-            restoreScrollPositionSmooth();
-            updateProgress();
-            saveBookmark();
+        progressBarContainer.addEventListener('mousedown', (e) => {
+            isDraggingProgress = true;
+            progressBarContainer.classList.add('dragging');
+            handleProgressScrub(e.clientX);
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingProgress) {
+                handleProgressScrub(e.clientX);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDraggingProgress) {
+                isDraggingProgress = false;
+                progressBarContainer.classList.remove('dragging');
+                saveBookmark();
+            }
+        });
+
+        // Touch support
+        progressBarContainer.addEventListener('touchstart', (e) => {
+            isDraggingProgress = true;
+            progressBarContainer.classList.add('dragging');
+            if (e.touches.length > 0) {
+                handleProgressScrub(e.touches[0].clientX);
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDraggingProgress && e.touches.length > 0) {
+                handleProgressScrub(e.touches[0].clientX);
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            if (isDraggingProgress) {
+                isDraggingProgress = false;
+                progressBarContainer.classList.remove('dragging');
+                saveBookmark();
+            }
         });
     }
 
@@ -215,6 +260,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Controls Toggle & Auto-Hide Behaviour
     readerViewport.addEventListener('click', toggleControls);
+
+    // Touch Swipe Navigation for precisely 1 page navigation
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    readerViewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchEndX = touchStartX;
+            touchEndY = touchStartY;
+        }
+    }, { passive: true });
+
+    readerViewport.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+            touchEndX = e.touches[0].clientX;
+            touchEndY = e.touches[0].clientY;
+        }
+    }, { passive: true });
+
+    readerViewport.addEventListener('touchend', () => {
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const swipeThreshold = 50;
+
+        if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > 0) {
+                // Swipe right -> Prev Page
+                prevPage();
+            } else {
+                // Swipe left -> Next Page
+                nextPage();
+            }
+        }
+    }, { passive: true });
 
     // Button controls in Drawer
     setupDrawerControls();
@@ -739,6 +822,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             pageNavLeft.title = "前のページへ";
             pageNavRight.title = "次のページへ";
+        }
+
+        // Update first page button chevron icon direction
+        const btnFirstPagePath = btnFirstPage ? btnFirstPage.querySelector('path') : null;
+        if (btnFirstPagePath) {
+            if (config.direction === 'rtl') {
+                // Point Right >>
+                btnFirstPagePath.setAttribute('d', 'M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5');
+            } else {
+                // Point Left <<
+                btnFirstPagePath.setAttribute('d', 'M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5');
+            }
         }
 
         // Update Button States in Drawer UI
