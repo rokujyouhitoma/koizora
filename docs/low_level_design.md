@@ -285,13 +285,14 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   ```
 
 #### 垂直方向の上寄せ配置 (上寄せアライメント)
-* **原因**: 縦書き表示時にフレックスコンテナ（`display: flex`）のデフォルト挙動やブラウザのクロス軸調整により、文字が垂直方向の下側に寄るバグが発生。
-* **対策**: 親要素 `.reader-viewport` に `align-items: flex-start` を設定し、かつ子要素 `.reader-content` に `align-self: flex-start` を設定することで、縦書きコンテンツが上端にしっかりと上寄せして表示されるように強制します。
+* **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。これにより、インライン方向である縦の長さが縮み、縦書きテキストが上下に2段（二段組み）に分割され、画面半分（特に上部）に巨大な空白ができる表示不具合が生じます。
+* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、標準的な**ブロックレイアウト（`display: block`）**に変更します。これにより、子要素 `.reader-content` の `height: 100%` はスクロールコンテナである `.reader-viewport` の内容高（パディング内側の高さ）と厳密に同一になり、高さの潰れや意図しない複数段への折り返しが防止されます。また、ブロック表示における標準的なコンテンツフローに従い、テキストは常に上端から配置されるため、縦位置が正確に上側に揃います。
   ```css
   .reader-viewport {
-      align-items: flex-start;
+      /* display: flex およびアライメント指定を削除 */
   }
   .reader-content {
-      align-self: flex-start;
+      /* align-self: flex-start を削除し、高さ 100% を保証 */
+      height: 100%;
   }
   ```
