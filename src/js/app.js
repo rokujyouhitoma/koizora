@@ -29,6 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progress-bar');
     const readingPercentage = document.getElementById('reading-percentage');
     const readingIndex = document.getElementById('reading-index');
+    
+    // Predefined Books Grid
+    const predefinedBooksGrid = document.getElementById('predefined-books-grid');
+
+    const PREDEFINED_BOOKS = [
+        { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", shortTitle: "序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt" },
+        { id: "musashi_02", title: "宮本武蔵 02 地の巻", shortTitle: "地の巻", cardId: 52396, path: "src/books/52396_yoko.txt" },
+        { id: "musashi_03", title: "宮本武蔵 03 水の巻", shortTitle: "水の巻", cardId: 52397, path: "src/books/52397_yoko.txt" },
+        { id: "musashi_04", title: "宮本武蔵 04 火の巻", shortTitle: "火の巻", cardId: 52398, path: "src/books/52398_yoko.txt" },
+        { id: "musashi_05", title: "宮本武蔵 05 風の巻", shortTitle: "風の巻", cardId: 52399, path: "src/books/52399_yoko.txt" },
+        { id: "musashi_06", title: "宮本武蔵 06 空の巻", shortTitle: "空の巻", cardId: 52400, path: "src/books/52400_yoko.txt" },
+        { id: "musashi_07", title: "宮本武蔵 07 二天の巻", shortTitle: "二天の巻", cardId: 52401, path: "src/books/52401_yoko.txt" },
+        { id: "musashi_08", title: "宮本武蔵 08 円明の巻", shortTitle: "円明の巻", cardId: 52402, path: "src/books/52402_yoko.txt" }
+    ];
 
     // ==========================================================================
     // State Variables
@@ -102,7 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
     pageNavRight.addEventListener('click', prevPage);  // Right click goes backward
 
     // Scroll & Window Resize Events
-    readerViewport.addEventListener('scroll', handleScroll);
+    let scrollSaveTimeout = null;
+    function handleScrollDebounced() {
+        handleScroll();
+        clearTimeout(scrollSaveTimeout);
+        scrollSaveTimeout = setTimeout(() => {
+            saveBookmark();
+        }, 300);
+    }
+    
+    readerViewport.addEventListener('scroll', handleScrollDebounced);
     window.addEventListener('resize', handleResize);
 
     // Keyboard navigation
@@ -122,6 +145,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Button controls in Drawer
     setupDrawerControls();
 
+    // Render Predefined Books Grid
+    if (predefinedBooksGrid) {
+        PREDEFINED_BOOKS.forEach(book => {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.setAttribute('data-id', book.id);
+            card.innerHTML = `
+                <div class="book-card-cover">
+                    <div class="book-card-title">${book.shortTitle}</div>
+                </div>
+                <div class="book-card-meta">${book.title.split(' ')[1]}</div>
+            `;
+            card.addEventListener('click', () => {
+                loadPredefinedBook(book);
+            });
+            predefinedBooksGrid.appendChild(card);
+        });
+    }
+
+    // Save bookmark on visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            saveBookmark();
+        }
+    });
+
     // Try to auto-load last session if available
     checkLastSession();
 
@@ -134,16 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const reader = new FileReader();
         
-        // Aozora is historically Shift_JIS. Let's read it as ArrayBuffer to decode.
         reader.onload = function(e) {
             const arrayBuffer = e.target.result;
-            // Decode with Shift_JIS
-            const decoder = new TextDecoder('shift-jis');
             let text = '';
             try {
+                const decoder = new TextDecoder('shift-jis', { fatal: true });
                 text = decoder.decode(arrayBuffer);
             } catch (err) {
-                console.error("Shift_JIS decode failed, trying UTF-8", err);
+                console.warn("Shift_JIS decode failed (fatal=true), falling back to UTF-8", err);
                 const utf8Decoder = new TextDecoder('utf-8');
                 text = utf8Decoder.decode(arrayBuffer);
             }
@@ -153,6 +200,34 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         reader.readAsArrayBuffer(file);
+    }
+
+    function loadPredefinedBook(book) {
+        currentFileName = `${book.cardId}_yoko.txt`;
+        currentFileType = 'txt';
+        
+        fetch(book.path)
+            .then(res => {
+                if (!res.ok) throw new Error(`Fetch failed: ${res.statusText}`);
+                return res.arrayBuffer();
+            })
+            .then(arrayBuffer => {
+                let text = '';
+                try {
+                    const decoder = new TextDecoder('shift-jis', { fatal: true });
+                    text = decoder.decode(arrayBuffer);
+                } catch (err) {
+                    console.warn("Shift_JIS decode failed (fatal=true), falling back to UTF-8 for predefined book", err);
+                    const utf8Decoder = new TextDecoder('utf-8');
+                    text = utf8Decoder.decode(arrayBuffer);
+                }
+                currentFileContent = text;
+                displayBook();
+            })
+            .catch(err => {
+                console.error(err);
+                alert(`作品の読み込みに失敗しました: ${err.message}`);
+            });
     }
 
     function displayBook() {
@@ -169,6 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const parsed = parseAozoraHTML(currentFileContent);
             parsedHTML = parsed.body;
             title = parsed.title || currentFileName.replace(/\.(x?html)/, '');
+        }
+
+        // Override with predefined book title if matched
+        const predefinedBook = PREDEFINED_BOOKS.find(b => currentFileName.includes(b.cardId.toString()));
+        if (predefinedBook) {
+            title = predefinedBook.title;
         }
 
         // Apply to viewer
