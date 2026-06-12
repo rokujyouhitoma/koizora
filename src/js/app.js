@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageNavLeft = document.getElementById('page-nav-left');
     const pageNavRight = document.getElementById('page-nav-right');
     const readerHeader = document.querySelector('.reader-header');
+    const readerFooter = document.querySelector('.reader-footer');
     
     // Progress
     const progressBarContainer = document.querySelector('.progress-bar-container');
@@ -212,9 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Header Auto-Hide Behaviour
-    readerViewport.addEventListener('mousemove', triggerHeaderShow);
-    readerViewport.addEventListener('click', triggerHeaderShow);
+    // Controls Toggle & Auto-Hide Behaviour
+    readerViewport.addEventListener('click', toggleControls);
 
     // Button controls in Drawer
     setupDrawerControls();
@@ -557,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Forward in LTR layout means scrolling Right (positive direction)
             readerViewport.scrollBy({ left: amount, behavior: 'smooth' });
         }
-        triggerHeaderShow();
     }
 
     function prevPage() {
@@ -569,7 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Backward in LTR layout means scrolling Left (negative direction)
             readerViewport.scrollBy({ left: -amount, behavior: 'smooth' });
         }
-        triggerHeaderShow();
     }
 
     function handleResize() {
@@ -771,20 +769,44 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeSettings() {
         settingsDrawer.classList.remove('open');
         drawerOverlay.classList.remove('open');
+        triggerHeaderShow();
     }
 
     // ==========================================================================
-    // Header UI Auto-Hide
+    // Header & Footer UI Toggle/Auto-Hide
     // ==========================================================================
+    function hideControls() {
+        if (!settingsDrawer.classList.contains('open')) {
+            readerHeader.classList.add('hidden');
+            if (readerFooter) {
+                readerFooter.classList.add('hidden');
+            }
+        }
+    }
+
     function triggerHeaderShow() {
         readerHeader.classList.remove('hidden');
+        if (readerFooter) {
+            readerFooter.classList.remove('hidden');
+        }
         
         clearTimeout(headerTimeout);
         headerTimeout = setTimeout(() => {
-            // Only hide if settings are closed
-            if (!settingsDrawer.classList.contains('open')) {
-                readerHeader.classList.add('hidden');
-            }
+            hideControls();
         }, 3000); // Hide after 3 seconds of inactivity
+    }
+
+    function toggleControls(e) {
+        // Prevent toggle if clicking interactive elements inside reader viewport
+        if (e.target.closest('a') || e.target.closest('ruby') || e.target.closest('button')) {
+            return;
+        }
+
+        if (readerHeader.classList.contains('hidden')) {
+            triggerHeaderShow();
+        } else {
+            clearTimeout(headerTimeout);
+            hideControls();
+        }
     }
 });

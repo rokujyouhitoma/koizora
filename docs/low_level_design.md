@@ -285,15 +285,18 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   ```
 
 #### 垂直方向の上寄せ配置 (上寄せアライメント)
-* **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。これにより、インライン方向である縦の長さが縮み、縦書きテキストが上下に2段（二段組み）に分割され、画面半分（特に上部）に巨大な空白ができる表示不具合が生じます。
-* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、標準的な**ブロックレイアウト（`display: block`）**に変更します。これにより、子要素 `.reader-content` の `height: 100%` はスクロールコンテナである `.reader-viewport` の内容高（パディング内側の高さ）と厳密に同一になり、高さの潰れや意図しない複数段への折り返しが防止されます。また、ブロック表示における標準的なコンテンツフローに従い、テキストは常に上端から配置されるため、縦位置が正確に上側に揃います。
+* **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。また、親要素に `padding` を設定して `height: 100%` を子要素に与えると、ブラウザがスクロールバーやパディングを誤って計算し、テキスト下部が画面外（ビューポート外）に押し出されて描画される問題が生じます。
+* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウト（`position: absolute; inset: 0`）に変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。子要素 `.reader-content` の高さは `height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom))` とし、同じ値の `margin-top` / `margin-bottom` を設定することで、親要素の高さ（画面全体高）に完璧に適合させつつ、ヘッダー/フッターとの干渉を防ぎ上揃えで描画させます。
   ```css
   .reader-viewport {
-      /* display: flex およびアライメント指定を削除 */
+      position: absolute;
+      inset: 0;
+      padding: 0 var(--reader-padding-x);
   }
   .reader-content {
-      /* align-self: flex-start を削除し、高さ 100% を保証 */
-      height: 100%;
+      height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
+      margin-top: var(--reader-padding-top);
+      margin-bottom: var(--reader-padding-bottom);
   }
   ```
 

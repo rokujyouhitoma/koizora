@@ -6,6 +6,11 @@
     --transition-fast: all 0.15s ease;
     --font-ui: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     
+    /* Reader Layout Paddings */
+    --reader-padding-top: 104px; /* 64px header + 40px padding */
+    --reader-padding-bottom: 80px; /* 40px footer + 40px padding */
+    --reader-padding-x: 60px;
+    
     /* Theme Defaults (Sepia / 和紙) */
     --bg-app: #f5eedc;
     --bg-card: #fdfaf2;
@@ -111,8 +116,9 @@ a:hover {
    ========================================================================== */
 .app-container {
     position: relative;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
 }
@@ -397,10 +403,15 @@ a:hover {
     display: flex;
     flex-direction: column;
     z-index: 5;
+    overflow: hidden;
 }
 
 /* Header UI */
 .reader-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 64px;
     padding: 0 24px;
     display: flex;
@@ -426,17 +437,20 @@ a:hover {
 
 /* Viewport for reading text */
 .reader-viewport {
-    flex: 1;
+    position: absolute;
+    inset: 0;
     overflow-x: auto;
     overflow-y: hidden;
-    position: relative;
-    padding: 40px 60px;
+    padding: 0 var(--reader-padding-x);
     /* CSS Scroll Snap for page alignment */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    /* Chrome/Safari scrollbar hide */
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    /* Hide scrollbar */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.reader-viewport::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
 
 /* We want to make sure the scroll starts from the right side */
@@ -461,7 +475,9 @@ a:hover {
     direction: ltr; /* Ensure vertical text always flows top-to-bottom and is top-aligned */
     width: max-content; /* Size container to fit all columns exactly, preventing trailing blank pages */
     
-    height: 100%;
+    height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
+    margin-top: var(--reader-padding-top);
+    margin-bottom: var(--reader-padding-bottom);
     /* Create multi-column layout for horizontal paging */
     column-fill: auto;
     column-gap: 80px; /* Space between pages */
@@ -484,12 +500,14 @@ a:hover {
     }
 }
 @media (max-width: 767px) {
-    .reader-viewport {
-        padding: 24px 20px; /* Reduce viewport padding on mobile to maximize area */
+    :root {
+        --reader-padding-top: 88px; /* 64px header + 24px padding */
+        --reader-padding-bottom: 64px; /* 40px footer + 24px padding */
+        --reader-padding-x: 20px;
     }
     .reader-content {
-        column-width: calc(100vw - 40px); /* Strictly force single column (100vw minus left/right padding) */
-        column-gap: 40px;
+        column-width: calc(100vw - var(--reader-padding-x) * 2); /* Strictly force single column (100vw minus left/right padding) */
+        column-gap: calc(var(--reader-padding-x) * 2);
     }
 }
 
@@ -567,8 +585,8 @@ a:hover {
    ========================================================================== */
 .page-nav {
     position: absolute;
-    top: 64px;
-    bottom: 40px;
+    top: 0;
+    bottom: 0;
     width: 20%;
     max-width: 150px;
     z-index: 6;
@@ -599,6 +617,10 @@ a:hover {
 
 /* Footer UI */
 .reader-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     height: 40px;
     background: var(--bg-ui);
     backdrop-filter: blur(10px);
@@ -609,6 +631,10 @@ a:hover {
     align-items: center;
     justify-content: space-between;
     z-index: 8;
+    transition: transform 0.3s ease;
+}
+.reader-footer.hidden {
+    transform: translateY(100%);
 }
 
 .progress-bar-container {
