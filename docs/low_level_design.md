@@ -264,3 +264,34 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 - **傍点 (`.bouten`)**:
   - `text-emphasis: sesame` もしくは `text-emphasis: dot`（ブラウザ互換性のために `-webkit-text-emphasis` も併記）。
   - カラーは現在の文字色（`var(--text-color)`）に同期します。
+
+### 5.4 モバイルレイアウト制限および垂直方向の上寄せ配置
+
+#### モバイル制限 (画面幅767px以下)
+* **Viewportパディングの削減**: 
+  左右のパディング幅を狭め、表示領域を最大化します。
+  ```css
+  .reader-viewport {
+      padding: 24px 20px;
+  }
+  ```
+* **単一カラム幅制限**:
+  画面の横幅から左右のパディング値（計40px）を差し引いた値を `column-width` に指定し、複数カラムが左右に並んで表示されるのを防ぎます。
+  ```css
+  .reader-content {
+      column-width: calc(100vw - 40px);
+      column-gap: 40px;
+  }
+  ```
+
+#### 垂直方向の上寄せ配置 (上寄せアライメント)
+* **原因**: 縦書き表示時にフレックスコンテナ（`display: flex`）のデフォルト挙動やブラウザのクロス軸調整により、文字が垂直方向の下側に寄るバグが発生。
+* **対策**: 親要素 `.reader-viewport` に `align-items: flex-start` を設定し、かつ子要素 `.reader-content` に `align-self: flex-start` を設定することで、縦書きコンテンツが上端にしっかりと上寄せして表示されるように強制します。
+  ```css
+  .reader-viewport {
+      align-items: flex-start;
+  }
+  .reader-content {
+      align-self: flex-start;
+  }
+  ```

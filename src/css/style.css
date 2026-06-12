@@ -433,6 +433,7 @@ a:hover {
     padding: 40px 60px;
     display: flex;
     justify-content: flex-start;
+    align-items: flex-start; /* Force vertical alignment to top */
     /* CSS Scroll Snap for page alignment */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -462,6 +463,7 @@ a:hover {
     -webkit-text-orientation: mixed;
     
     height: 100%;
+    align-self: flex-start; /* Force alignment to top of flex container */
     /* Create multi-column layout for horizontal paging */
     column-fill: auto;
     column-gap: 80px; /* Space between pages */
@@ -484,8 +486,11 @@ a:hover {
     }
 }
 @media (max-width: 767px) {
+    .reader-viewport {
+        padding: 24px 20px; /* Reduce viewport padding on mobile to maximize area */
+    }
     .reader-content {
-        column-width: 80vw; /* On smaller devices, make it almost full width */
+        column-width: calc(100vw - 40px); /* Strictly force single column (100vw minus left/right padding) */
         column-gap: 40px;
     }
 }
