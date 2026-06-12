@@ -7,6 +7,8 @@
   本ドキュメント（詳細設計書）は、**TOGAF EA** の「データアーキテクチャ (DA)」および「テクノロジーアーキテクチャ (TA)」における**物理（実装）設計**を定義します。具体的な関数仕様、変数名、正規表現の置換仕様、ページ計算アルゴリズム、LocalStorageのJSONシリアライズスキーマ、CSS変数の実数値へのマッピングなどを物理レベルで規定します。
 * **ADR (Architecture Decision Record) との連携**:
   パース処理の正規表現定義や、RTLにおけるスクロール位置補正計算式など、詳細設計・実装段階で発生した個別の技術的な意思決定や制約事項は、[docs/adr/](file:///workspace/koizora/docs/adr/) 内のADRに背景とともに記録されます。
+* **設計ドキュメント間のすみ分け**:
+  基本設計（HLD）や要件定義（SRD）との詳細な記述のすみ分け、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](file:///workspace/koizora/docs/document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
 
 ---
 
@@ -88,6 +90,47 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
 2. `<title>` タグから作品タイトルを抽出します。
 3. 本文部分（`.main_body` または `body`）を取得します。
 4. HTML版青空文庫特有のフッター要素（文献情報 `.bibliographical_information` およびカードリンク `.card_link`）をDOM操作で明示的に `remove()` 処理します。
+
+### 2.3 事前定義作品のマスターデータとロード仕様
+
+* **マスターデータ構造**:
+  事前定義作品（吉川英治「宮本武蔵」8作品）のメタデータを `app.js` 内にオブジェクト配列として定義します。
+  ```javascript
+  const PREDEFINED_BOOKS = [
+    { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", cardId: 52395, path: "books/52395_yoko.txt" },
+    { id: "musashi_02", title: "宮本武蔵 02 地の巻", cardId: 52396, path: "books/52396_yoko.txt" },
+    { id: "musashi_03", title: "宮本武蔵 03 水の巻", cardId: 52397, path: "books/52397_yoko.txt" },
+    { id: "musashi_04", title: "宮本武蔵 04 火の巻", cardId: 52398, path: "books/52398_yoko.txt" },
+    { id: "musashi_05", title: "宮本武蔵 05 風の巻", cardId: 52399, path: "books/52399_yoko.txt" },
+    { id: "musashi_06", title: "宮本武蔵 06 空の巻", cardId: 52400, path: "books/52400_yoko.txt" },
+    { id: "musashi_07", title: "宮本武蔵 07 二天の巻", cardId: 52401, path: "books/52401_yoko.txt" },
+    { id: "musashi_08", title: "宮本武蔵 08 円明の巻", cardId: 52402, path: "books/52402_yoko.txt" }
+  ];
+  ```
+* **データの取得アルゴリズム (`loadPredefinedBook(bookId)`)**:
+  1. ユーザーがウェルカム画面で作品を選択した際、対応する `bookId` をキーとして `PREDEFINED_BOOKS` から該当するオブジェクトを抽出します。
+  2. `path` をターゲットとして `fetch` API を用いて非同期でテキストデータを取得します（ローカルリソースに静的ファイルとして格納した本文を取得）。
+     ```javascript
+     async function loadPredefinedBook(bookId) {
+         const book = PREDEFINED_BOOKS.find(b => b.id === bookId);
+         if (!book) return;
+         try {
+             const response = await fetch(book.path);
+             if (!response.ok) throw new Error('Network response was not ok');
+             const text = await response.text(); // 静的ファイルは UTF-8 で配置
+             // グローバル状態変数への書き込み
+             currentFileName = `${book.id}.txt`;
+             currentFileType = 'txt';
+             currentFileContent = text;
+             
+             // パースと描画の実行
+             displayBook(text);
+         } catch (error) {
+             console.error('Failed to load predefined book:', error);
+             alert('作品の読み込みに失敗しました。');
+         }
+     }
+     ```
 
 ---
 
