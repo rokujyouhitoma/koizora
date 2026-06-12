@@ -107,28 +107,36 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
     { id: "musashi_08", title: "宮本武蔵 08 円明の巻", cardId: 52402, path: "src/books/52402_yoko.txt" }
   ];
   ```
-* **データの取得アルゴリズム (`loadPredefinedBook(bookId)`)**:
-  1. ユーザーがウェルカム画面で作品を選択した際、対応する `bookId` をキーとして `PREDEFINED_BOOKS` から該当するオブジェクトを抽出します。
-  2. `path` をターゲットとして `fetch` API を用いて非同期でテキストデータを取得します（ローカルリソースに静的ファイルとして格納した本文を取得）。
+* **データの取得アルゴリズム (`loadPredefinedBook(book)`)**:
+  1. ユーザーがウェルカム画面で作品を選択した際、選択された `book` オブジェクトを引数として受け取ります。
+  2. `path` をターゲットとして `fetch` API を用いて非同期でテキストデータを取得し、バイナリバッファから Shift_JIS （失敗時は UTF-8）でデコードします。
      ```javascript
-     async function loadPredefinedBook(bookId) {
-         const book = PREDEFINED_BOOKS.find(b => b.id === bookId);
-         if (!book) return;
-         try {
-             const response = await fetch(book.path);
-             if (!response.ok) throw new Error('Network response was not ok');
-             const text = await response.text(); // 静的ファイルは UTF-8 で配置
-             // グローバル状態変数への書き込み
-             currentFileName = `${book.id}.txt`;
-             currentFileType = 'txt';
-             currentFileContent = text;
-             
-             // パースと描画の実行
-             displayBook(text);
-         } catch (error) {
-             console.error('Failed to load predefined book:', error);
-             alert('作品の読み込みに失敗しました。');
-         }
+     function loadPredefinedBook(book) {
+         currentFileName = `${book.cardId}_yoko.txt`;
+         currentFileType = 'txt';
+         
+         fetch(book.path)
+             .then(res => {
+                 if (!res.ok) throw new Error(`Fetch failed: ${res.statusText}`);
+                 return res.arrayBuffer();
+             })
+             .then(arrayBuffer => {
+                 let text = '';
+                 try {
+                     const decoder = new TextDecoder('shift-jis', { fatal: true });
+                     text = decoder.decode(arrayBuffer);
+                 } catch (err) {
+                     console.warn("Shift_JIS decode failed, falling back to UTF-8", err);
+                     const utf8Decoder = new TextDecoder('utf-8');
+                     text = utf8Decoder.decode(arrayBuffer);
+                 }
+                 currentFileContent = text;
+                 displayBook();
+             })
+             .catch(err => {
+                 console.error(err);
+                 alert(`作品の読み込みに失敗しました: ${err.message}`);
+             });
      }
      ```
 
@@ -226,7 +234,7 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   ```
 
 ### 4.2 しおり進捗率 (`bookmark_<filename>`)
-- **キー名**: `bookmark_${currentFileName}` （例: `bookmark_musashi_01.txt`）
+- **キー名**: `bookmark_${currentFileName}` （例: `bookmark_52395_yoko.txt`）
 - **値**: 進捗率を示す文字列（実数値、例: `"0.4578"`)
 
 ### 4.3 セッション復元データ
@@ -258,28 +266,28 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 ### 5.2 フォントサイズ・間隔のクラスマッピング
 
 #### 文字サイズ
-- `.size-sm`: `font-size: 1.0rem` (モバイル可読サイズ下限)
-- `.size-md`: `font-size: 1.25rem` (標準)
-- `.size-lg`: `font-size: 1.5rem` (大)
-- `.size-xl`: `font-size: 1.85rem` (特大)
+- `.size-sm`: `font-size: 14.5px` (モバイル可読サイズ下限)
+- `.size-md`: `font-size: 17px` (標準)
+- `.size-lg`: `font-size: 21px` (大)
+- `.size-xl`: `font-size: 25px` (特大)
 
 #### 行間 (Line Height)
-- `.line-height-tight`: `line-height: 1.6`
-- `.line-height-normal`: `line-height: 1.95` (縦書きの推奨値)
-- `.line-height-loose`: `line-height: 2.4`
+- `.line-height-tight`: `line-height: 1.7`
+- `.line-height-normal`: `line-height: 2.1` (縦書きの推奨値)
+- `.line-height-loose`: `line-height: 2.6`
 
 #### 文字間 (Letter Spacing)
-- `.spacing-tight`: `letter-spacing: 0.04em`
+- `.spacing-tight`: `letter-spacing: 0.03em`
 - `.spacing-normal`: `letter-spacing: 0.08em`
-- `.spacing-loose`: `letter-spacing: 0.15em`
+- `.spacing-loose`: `letter-spacing: 0.16em`
 
 ### 5.3 ルビと傍点のCSS詳細
 - **ルビ (`rt`)**:
-  - `font-size: 0.45em`
+  - `font-size: 0.52em`
   - 縦書きのため、自動的に文字の右側に表示されます。
 - **傍点 (`.bouten`)**:
-  - `text-emphasis: sesame` もしくは `text-emphasis: dot`（ブラウザ互換性のために `-webkit-text-emphasis` も併記）。
-  - カラーは現在の文字色（`var(--text-color)`）に同期します。
+  - `-webkit-text-emphasis: sesame` および `text-emphasis: sesame`。
+  - カラーは現在の文字色（`var(--text-main)`等）に自動同期します。
 
 ### 5.4 モバイルレイアウト制限および垂直方向の上寄せ配置
 

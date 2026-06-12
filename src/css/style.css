@@ -547,6 +547,12 @@ a:hover {
     font-weight: 400;
 }
 
+/* Bouten (emphasis dots) */
+.reader-content .bouten {
+    -webkit-text-emphasis: sesame;
+    text-emphasis: sesame;
+}
+
 /* General cleanups */
 .reader-content div.main_body {
     display: block;
