@@ -339,3 +339,31 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
       width: max-content; /* 全カラムの合計幅にサイズを固定し、空スクロールを完全に抑止 */
   }
   ```
+
+### 5.7 プログレスバーの左右反転とレイアウト方向制御
+
+* **原因**: ページの送り方向（RTL / LTR）が切り替わった際、進捗状況を示すプログレスバーおよびつまみの動作・充填方向も動的に反転させる必要があります。これをビューアーコンテンツ（`.reader-content`）に適用されている `direction: rtl` 等と共通のクラスで行うと、前述のインライン方向や表示の潰れバグを誘発するため、影響範囲をレイアウト方向制御クラスとして分離する必要がありました。
+* **対策**:
+  1. `applySettings()` 関数内で、`document.body` に対して現在の読書方向に対応するクラス（`layout-direction-rtl` または `layout-direction-ltr`）を動的に追加します。
+  2. CSSにて、これらのクラスを親セレクタとして、プログレスバーのフレックスコンテナの配置方向および絶対配置のつまみのオフセットを定義します。
+  ```css
+  /* RTL (右から左) の場合のプログレスバー・つまみの配置 */
+  body.layout-direction-rtl .progress-bar-container {
+      display: flex;
+      justify-content: flex-end;
+  }
+  body.layout-direction-rtl .progress-thumb {
+      left: -8px;
+      right: auto;
+  }
+
+  /* LTR (左から右) の場合のプログレスバー・つまみの配置 */
+  body.layout-direction-ltr .progress-bar-container {
+      display: flex;
+      justify-content: flex-start;
+  }
+  body.layout-direction-ltr .progress-thumb {
+      right: -8px;
+      left: auto;
+  }
+  ```
