@@ -1,5 +1,5 @@
 /**
- * こいぞら - 青空文庫 縦書きビューアー JS
+ * ゆうぞら - 青空文庫 縦書きビューアー JS
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeScreen.classList.remove('hidden');
         currentFileName = '';
         currentFileContent = '';
-        document.title = 'こいぞら - 青空文庫縦書きビューアー';
+        document.title = 'ゆうぞら - 青空文庫縦書きビューアー';
     });
 
     // First Page Navigation
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Apply to viewer
         bookTitle.textContent = title;
-        document.title = `${title} - こいぞら`;
+        document.title = `${title} - ゆうぞら`;
         readerContent.innerHTML = parsedHTML;
 
         // Display Reader, Hide Welcome Screen
@@ -788,11 +788,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveSettings() {
-        localStorage.setItem('koizora_config', JSON.stringify(config));
+        localStorage.setItem('yuzora_config', JSON.stringify(config));
     }
 
     function loadSettings() {
-        const saved = localStorage.getItem('koizora_config');
+        const saved = localStorage.getItem('yuzora_config') || localStorage.getItem('koizora_config');
         if (saved) {
             try {
                 Object.assign(config, JSON.parse(saved));

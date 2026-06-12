@@ -1,4 +1,4 @@
-# 要件定義書 (System Requirements Definition) - こいぞら (Koizora)
+# 要件定義書 (System Requirements Definition) - ゆうぞら (Yuzora)
 
 ## 1. はじめに (Introduction)
 ### 1.1 目的

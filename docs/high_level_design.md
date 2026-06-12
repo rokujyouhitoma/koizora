@@ -1,12 +1,12 @@
-# 基本設計書 (High-Level Design) - こいぞら (Koizora)
+# 基本設計書 (High-Level Design) - ゆうぞら (Yuzora)
 
-本ドキュメントは、要件定義書（[system_requirements.md](/docs/system_requirements.md)）に規定されたシステム要件に基づき、青空文庫縦書きビューアー「こいぞら (Koizora)」の基本設計（High-Level Design）を定義します。
+本ドキュメントは、要件定義書（[system_requirements.md](/docs/system_requirements.md)）に規定されたシステム要件に基づき、青空文庫縦書きビューアー「ゆうぞら (Yuzora)」の基本設計（High-Level Design）を定義します。
 
 ---
 
 ## 1. システム構成・アーキテクチャ (System Architecture)
 
-こいぞらは、サーバーサイド処理を一切行わない完全な**クライアントサイド静的シングルページアプリケーション (SPA)** です。
+ゆうぞらは、サーバーサイド処理を一切行わない完全な**クライアントサイド静的シングルページアプリケーション (SPA)** です。
 
 ### 1.1 アーキテクチャ図 (構造モデル)
 

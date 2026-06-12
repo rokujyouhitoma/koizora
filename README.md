@@ -1,8 +1,8 @@
-# こいぞら (Koizora) - 青空文庫縦書きビューアー
+# ゆうぞら (Yuzora) - 青空文庫縦書きビューアー
 
 青空文庫のテキストファイル（.txt）やXHTMLファイル（.html）をブラウザへドラッグ＆ドロップするだけで、美しい縦書き表示に変換し、快適に読書ができるクライアントサイド専用の静的Web SPAビューアーです。
 
-🚀 **動作URL (GitHub Pages デモサイト)**: [https://rokujyouhitoma.github.io/koizora/](https://rokujyouhitoma.github.io/koizora/)
+🚀 **動作URL (GitHub Pages デモサイト)**: [https://rokujyouhitoma.github.io/yuzora/](https://rokujyouhitoma.github.io/yuzora/)
 
 ---
 
@@ -42,7 +42,7 @@
 ## 📁 ディレクトリ構成
 
 ```
-koizora/
+yuzora/
 ├── .github/workflows/static.yml   # GitHub Pages デプロイワークフロー
 ├── docs/                         # 要求仕様・要件・設計書ドキュメント類
 │   ├── adr/                      # アーキテクチャ意思決定記録 (ADR)
