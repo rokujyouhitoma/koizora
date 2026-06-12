@@ -132,7 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleProgressScrub(clientX) {
         const rect = progressBarContainer.getBoundingClientRect();
         const clickX = clientX - rect.left;
-        const clickProgress = Math.min(1, Math.max(0, clickX / rect.width));
+        let clickProgress = Math.min(1, Math.max(0, clickX / rect.width));
+        
+        if (config.direction === 'rtl') {
+            clickProgress = 1 - clickProgress;
+        }
         
         bookmarkProgress = clickProgress;
         restoreScrollPosition(); // Instant feedback for real-time scrub
@@ -289,12 +293,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const swipeThreshold = 50;
 
         if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
-            if (deltaX > 0) {
-                // Swipe right -> Prev Page
-                prevPage();
+            if (config.direction === 'rtl') {
+                if (deltaX > 0) {
+                    nextPage(); // Swipe right -> Next Page
+                } else {
+                    prevPage(); // Swipe left -> Prev Page
+                }
             } else {
-                // Swipe left -> Next Page
-                nextPage();
+                if (deltaX > 0) {
+                    prevPage(); // Swipe right -> Prev Page
+                } else {
+                    nextPage(); // Swipe left -> Next Page
+                }
             }
         }
     }, { passive: true });
@@ -697,16 +707,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupDrawerControls() {
         // Theme Selector
         setupButtonGroup('.theme-selector button', 'theme', (val) => {
-            // Apply theme class to body
-            document.body.className = '';
-            document.body.classList.add(`theme-${val}`);
+            applySettings();
         });
 
         // Font Family
         setupButtonGroup('.font-selector button', 'font', (val) => {
             isReflowing = true;
-            readerContent.classList.remove('font-mincho', 'font-gothic');
-            readerContent.classList.add(val);
+            applySettings();
             setTimeout(() => {
                 restoreScrollPosition();
                 updateProgress();
@@ -717,18 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reading Direction
         setupButtonGroup('.direction-selector button', 'direction', (val) => {
             isReflowing = true;
-            readerContent.classList.remove('direction-rtl', 'direction-ltr');
-            readerContent.classList.add(`direction-${val}`);
-            
-            // Adjust overlay title tooltips dynamically
-            if (val === 'rtl') {
-                pageNavLeft.title = "次のページへ";
-                pageNavRight.title = "前のページへ";
-            } else {
-                pageNavLeft.title = "前のページへ";
-                pageNavRight.title = "次のページへ";
-            }
-            
+            applySettings();
             setTimeout(() => {
                 restoreScrollPosition();
                 updateProgress();
@@ -739,8 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Font Size
         setupButtonGroup('.size-selector button', 'size', (val) => {
             isReflowing = true;
-            readerContent.classList.remove('size-sm', 'size-md', 'size-lg', 'size-xl');
-            readerContent.classList.add(val);
+            applySettings();
             setTimeout(() => {
                 restoreScrollPosition();
                 updateProgress();
@@ -751,8 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Line Height
         setupButtonGroup('.lh-selector button', 'lh', (val) => {
             isReflowing = true;
-            readerContent.classList.remove('line-height-tight', 'line-height-normal', 'line-height-loose');
-            readerContent.classList.add(val);
+            applySettings();
             setTimeout(() => {
                 restoreScrollPosition();
                 updateProgress();
@@ -763,8 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Letter Spacing
         setupButtonGroup('.spacing-selector button', 'spacing', (val) => {
             isReflowing = true;
-            readerContent.classList.remove('spacing-tight', 'spacing-normal', 'spacing-loose');
-            readerContent.classList.add(val);
+            applySettings();
             setTimeout(() => {
                 restoreScrollPosition();
                 updateProgress();
@@ -807,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function applySettings() {
         // Apply settings config values to target elements
         document.body.className = '';
-        document.body.classList.add(`theme-${config.theme}`);
+        document.body.classList.add(`theme-${config.theme}`, `layout-direction-${config.direction}`);
 
         // Update CSS direction dynamically to align scroll origin with text flow direction
         readerViewport.style.direction = config.direction;

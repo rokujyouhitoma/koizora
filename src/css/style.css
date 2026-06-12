@@ -685,6 +685,25 @@ a:hover {
     transition: none !important;
 }
 
+/* Progress Bar RTL/LTR Support */
+body.layout-direction-rtl .progress-bar-container {
+    display: flex;
+    justify-content: flex-end;
+}
+body.layout-direction-rtl .progress-thumb {
+    left: -8px;
+    right: auto;
+}
+
+body.layout-direction-ltr .progress-bar-container {
+    display: flex;
+    justify-content: flex-start;
+}
+body.layout-direction-ltr .progress-thumb {
+    right: -8px;
+    left: auto;
+}
+
 .footer-info {
     font-size: 12px;
     font-weight: 500;
