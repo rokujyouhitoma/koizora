@@ -296,3 +296,13 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
       height: 100%;
   }
   ```
+
+### 5.5 縦書きテキストのインライン方向（上から下）の固定
+
+* **原因**: ページめくりのスクロール初期表示位置を制御するため、親要素 `.reader-viewport` の CSS `direction` プロパティを `rtl` または `ltr` に動的に切り替えています。しかし、子要素 `.reader-content` が `direction` を継承すると、RTL 読書方向時に `direction: rtl` が適用され、縦書き文字のインライン方向（テキストの流れる方向）が「下から上」に反転してしまいます。このため、縦位置が下揃え（物理的な下端）になり、句読点（「。」など）が行頭（物理的な上端）に誤って回り込むなどの禁則処理・アライメントバグが発生します。
+* **対策**: 子要素 `.reader-content` のスタイルに明示的に `direction: ltr;` を指定します。これにより、親要素から `direction: rtl` が継承されるのを防ぎ、縦書きテキストの流れる方向を常に「上から下」に維持し、文章を物理的な「上揃え」で正しく描画させます。
+  ```css
+  .reader-content {
+      direction: ltr; /* 縦書きテキストの流れ方向を常に「上から下」に固定 */
+  }
+  ```
