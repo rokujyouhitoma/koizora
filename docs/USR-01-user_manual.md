@@ -1,4 +1,4 @@
-# [DOC-0006] 操作マニュアル (User Operations Manual) - ゆうぞら (Yuzora)
+# [USR-01] 操作マニュアル (User Operations Manual) - ゆうぞら (Yuzora)
 
 本マニュアルは、青空文庫縦書きビューアー「ゆうぞら」の基本的な使い方、画面表示の見方、および表示設定のカスタマイズ方法について説明します。
 

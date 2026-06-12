@@ -1,6 +1,6 @@
-# [DOC-0004] 基本設計書 (High-Level Design) - ゆうぞら (Yuzora)
+# [DSN-01] 基本設計書 (High-Level Design) - ゆうぞら (Yuzora)
 
-本ドキュメントは、要件定義書（[0003-system_requirements.md](/docs/0003-system_requirements.md)）に規定されたシステム要件に基づき、青空文庫縦書きビューアー「ゆうぞら (Yuzora)」の基本設計（High-Level Design）を定義します。
+本ドキュメントは、要件定義書（[REQ-03-system_requirements.md](/docs/REQ-03-system_requirements.md)）に規定されたシステム要件に基づき、青空文庫縦書きビューアー「ゆうぞら (Yuzora)」の基本設計（High-Level Design）を定義します。
 
 ---
 
@@ -48,7 +48,7 @@ graph TD
 * **ADR (Architecture Decision Record) との連携**:
   本基本設計に至る過程で議論・策定された、Vanilla JSの選定、CSSマルチカラムの採用、セッション復元の持ち方などの重要なアーキテクチャ意思決定は、[docs/adr/](/docs/adr/) 配下に個別のドキュメントとして記録・管理されます。
 * **設計ドキュメント間のすみ分け**:
-  要件定義（SRD）や詳細設計（LLD）との境界、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](/docs/0000-document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
+  要件定義（SRD）や詳細設計（LLD）との境界、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](/docs/MNG-01-document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
 
 ---
 
