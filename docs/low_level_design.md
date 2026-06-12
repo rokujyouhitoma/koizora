@@ -1,6 +1,12 @@
 # 詳細設計書 (Low-Level Design) - コイゾラ (Koizora)
 
-本ドキュメントは、青空文庫縦書きビューアー「コイゾラ (Koizora)」の内部設計およびアルゴリズム仕様（Low-Level Design）を定義します。
+本ドキュメントは、基本設計書（[high_level_design.md](file:///workspace/koizora/docs/high_level_design.md)）で定義された設計方針に基づき、青空文庫縦書きビューアー「コイゾラ (Koizora)」の内部設計およびアルゴリズム仕様（Low-Level Design）を定義します。
+
+## 0. 設計の位置づけ (Design Alignment)
+* **TOGAF EA との位置づけ**:
+  本ドキュメント（詳細設計書）は、**TOGAF EA** の「データアーキテクチャ (DA)」および「テクノロジーアーキテクチャ (TA)」における**物理（実装）設計**を定義します。具体的な関数仕様、変数名、正規表現の置換仕様、ページ計算アルゴリズム、LocalStorageのJSONシリアライズスキーマ、CSS変数の実数値へのマッピングなどを物理レベルで規定します。
+* **ADR (Architecture Decision Record) との連携**:
+  パース処理の正規表現定義や、RTLにおけるスクロール位置補正計算式など、詳細設計・実装段階で発生した個別の技術的な意思決定や制約事項は、[docs/adr/](file:///workspace/koizora/docs/adr/) 内のADRに背景とともに記録されます。
 
 ---
 
