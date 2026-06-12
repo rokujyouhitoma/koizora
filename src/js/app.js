@@ -1,5 +1,5 @@
 /**
- * コイゾラ - 青空文庫 縦書きビューアー JS
+ * こいぞら - 青空文庫 縦書きビューアー JS
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeScreen.classList.remove('hidden');
         currentFileName = '';
         currentFileContent = '';
-        document.title = 'コイゾラ - 青空文庫縦書きビューアー';
+        document.title = 'こいぞら - 青空文庫縦書きビューアー';
     });
 
     // First Page Navigation
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Apply to viewer
         bookTitle.textContent = title;
-        document.title = `${title} - コイゾラ`;
+        document.title = `${title} - こいぞら`;
         readerContent.innerHTML = parsedHTML;
 
         // Display Reader, Hide Welcome Screen

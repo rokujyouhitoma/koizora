@@ -1,6 +1,6 @@
-# 詳細設計書 (Low-Level Design) - コイゾラ (Koizora)
+# 詳細設計書 (Low-Level Design) - こいぞら (Koizora)
 
-本ドキュメントは、基本設計書（[high_level_design.md](/docs/high_level_design.md)）で定義された設計方針に基づき、青空文庫縦書きビューアー「コイゾラ (Koizora)」の内部設計およびアルゴリズム仕様（Low-Level Design）を定義します。
+本ドキュメントは、基本設計書（[high_level_design.md](/docs/high_level_design.md)）で定義された設計方針に基づき、青空文庫縦書きビューアー「こいぞら (Koizora)」の内部設計およびアルゴリズム仕様（Low-Level Design）を定義します。
 
 ## 0. 設計の位置づけ (Design Alignment)
 * **TOGAF EA との位置づけ**:
@@ -136,7 +136,7 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
 
 ## 3. 縦書きマルチカラム・スクロール位置計算 (Pagination & Scroll Physics)
 
-コイゾラは、CSSのマルチカラム（段組み）機能を利用して、右から左へと横スクロールする見開きビューアーを実現しています。
+こいぞらは、CSSのマルチカラム（段組み）機能を利用して、右から左へと横スクロールする見開きビューアーを実現しています。
 
 ```
  +-------------------------------------------------------+
