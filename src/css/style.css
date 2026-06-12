@@ -421,7 +421,7 @@ a:hover {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
-    z-index: 8;
+    z-index: 10;
     transition: transform 0.3s ease;
 }
 .reader-header.hidden {
@@ -439,6 +439,7 @@ a:hover {
 .reader-viewport {
     position: absolute;
     inset: 0;
+    z-index: 1;
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0 var(--reader-padding-x);
@@ -589,7 +590,7 @@ a:hover {
     bottom: 0;
     width: 20%;
     max-width: 150px;
-    z-index: 6;
+    z-index: 5;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -630,7 +631,7 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    z-index: 8;
+    z-index: 10;
     transition: transform 0.3s ease;
 }
 .reader-footer.hidden {
@@ -685,14 +686,14 @@ a:hover {
     background: var(--bg-card);
     border-left: 1px solid var(--border-color);
     box-shadow: var(--shadow-lg);
-    z-index: 100;
+    z-index: 200;
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .settings-drawer.open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
 }
 
 .drawer-header {
@@ -807,13 +808,13 @@ a:hover {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
-    z-index: 90;
+    z-index: 190;
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
 }
 .drawer-overlay.open {
-    opacity: 1;
+    opacity: 1 !important;
     pointer-events: auto;
 }
 
