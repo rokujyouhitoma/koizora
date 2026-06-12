@@ -46,11 +46,13 @@ yuzora/
 ├── .github/workflows/static.yml   # GitHub Pages デプロイワークフロー
 ├── docs/                         # 要求仕様・要件・設計書ドキュメント類
 │   ├── adr/                      # アーキテクチャ意思決定記録 (ADR)
-│   ├── user_requirements.md      # 要求定義書 (URD)
-│   ├── system_requirements.md    # 要件定義書 (SRD)
-│   ├── high_level_design.md      # 基本設計書 (HLD)
-│   ├── low_level_design.md       # 詳細設計書 (LLD)
-│   └── document_ledger.md        # ドキュメント管理・台帳
+│   ├── 0000-document_ledger.md   # 文書管理・ドキュメント台帳
+│   ├── 0001-development_process.md # 開発プロセスおよび成果物定義書
+│   ├── 0002-user_requirements.md # 要求定義書 (URD)
+│   ├── 0003-system_requirements.md # 要件定義書 (SRD)
+│   ├── 0004-high_level_design.md # 基本設計書 (HLD)
+│   ├── 0005-low_level_design.md  # 詳細設計書 (LLD)
+│   └── 0006-user_manual.md       # 操作マニュアル
 ├── src/                          # ソースコード
 │   ├── books/                    # 同梱「宮本武蔵」8作品テキストデータ
 │   ├── css/

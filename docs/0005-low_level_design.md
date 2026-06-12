@@ -1,6 +1,6 @@
-# 詳細設計書 (Low-Level Design) - ゆうぞら (Yuzora)
+# [DOC-0005] 詳細設計書 (Low-Level Design) - ゆうぞら (Yuzora)
 
-本ドキュメントは、基本設計書（[high_level_design.md](/docs/high_level_design.md)）で定義された設計方針に基づき、青空文庫縦書きビューアー「ゆうぞら (Yuzora)」の内部設計およびアルゴリズム仕様（Low-Level Design）を定義します。
+本ドキュメントは、基本設計書（[0004-high_level_design.md](/docs/0004-high_level_design.md)）で定義された設計方針に基づき、青空文庫縦書きビューアー「ゆうぞら (Yuzora)」の内部設計およびアルゴリズム仕様（Low-Level Design）を定義します。
 
 ## 0. 設計の位置づけ (Design Alignment)
 * **TOGAF EA との位置づけ**:
@@ -8,7 +8,7 @@
 * **ADR (Architecture Decision Record) との連携**:
   パース処理の正規表現定義や、RTLにおけるスクロール位置補正計算式など、詳細設計・実装段階で発生した個別の技術的な意思決定や制約事項は、[docs/adr/](/docs/adr/) 内のADRに背景とともに記録されます。
 * **設計ドキュメント間のすみ分け**:
-  基本設計（HLD）や要件定義（SRD）との詳細な記述のすみ分け、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](/docs/document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
+  基本設計（HLD）や要件定義（SRD）との詳細な記述のすみ分け、およびオーバーラップした際のすみ分け・分掌については、[文書管理・ドキュメント台帳](/docs/0000-document_ledger.md) に規定されている「設計ドキュメント間のすみ分けと分掌」に従います。
 
 ---
 
