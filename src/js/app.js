@@ -247,6 +247,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
         if (readerScreen.classList.contains('hidden')) return;
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            toggleControls();
+            e.preventDefault();
+            return;
+        }
         if (config.direction === 'rtl') {
             if (e.key === 'ArrowLeft') {
                 nextPage(); // RTL: left is forward
@@ -886,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleControls(e) {
         // Prevent toggle if clicking interactive elements inside reader viewport
-        if (e.target.closest('a') || e.target.closest('ruby') || e.target.closest('button')) {
+        if (e && e.type === 'click' && (e.target.closest('a') || e.target.closest('ruby') || e.target.closest('button'))) {
             return;
         }
 
