@@ -14,7 +14,7 @@
 
 ## 1. プログラム内部状態管理 (State Variables)
 
-[app.js](/app.js) の内部において、アプリケーションの動作状態は以下のグローバル変数（クロージャ内変数）で管理されます。
+[app.js](/src/js/app.js) の内部において、アプリケーションの動作状態は以下のグローバル変数（クロージャ内変数）で管理されます。
 
 | 変数名 | 型 | 初期値 | 役割・説明 |
 | :--- | :--- | :--- | :--- |
@@ -97,14 +97,14 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
   事前定義作品（吉川英治「宮本武蔵」8作品）のメタデータを `app.js` 内にオブジェクト配列として定義します。
   ```javascript
   const PREDEFINED_BOOKS = [
-    { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", cardId: 52395, path: "books/52395_yoko.txt" },
-    { id: "musashi_02", title: "宮本武蔵 02 地の巻", cardId: 52396, path: "books/52396_yoko.txt" },
-    { id: "musashi_03", title: "宮本武蔵 03 水の巻", cardId: 52397, path: "books/52397_yoko.txt" },
-    { id: "musashi_04", title: "宮本武蔵 04 火の巻", cardId: 52398, path: "books/52398_yoko.txt" },
-    { id: "musashi_05", title: "宮本武蔵 05 風の巻", cardId: 52399, path: "books/52399_yoko.txt" },
-    { id: "musashi_06", title: "宮本武蔵 06 空の巻", cardId: 52400, path: "books/52400_yoko.txt" },
-    { id: "musashi_07", title: "宮本武蔵 07 二天の巻", cardId: 52401, path: "books/52401_yoko.txt" },
-    { id: "musashi_08", title: "宮本武蔵 08 円明の巻", cardId: 52402, path: "books/52402_yoko.txt" }
+    { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt" },
+    { id: "musashi_02", title: "宮本武蔵 02 地の巻", cardId: 52396, path: "src/books/52396_yoko.txt" },
+    { id: "musashi_03", title: "宮本武蔵 03 水の巻", cardId: 52397, path: "src/books/52397_yoko.txt" },
+    { id: "musashi_04", title: "宮本武蔵 04 火の巻", cardId: 52398, path: "src/books/52398_yoko.txt" },
+    { id: "musashi_05", title: "宮本武蔵 05 風の巻", cardId: 52399, path: "src/books/52399_yoko.txt" },
+    { id: "musashi_06", title: "宮本武蔵 06 空の巻", cardId: 52400, path: "src/books/52400_yoko.txt" },
+    { id: "musashi_07", title: "宮本武蔵 07 二天の巻", cardId: 52401, path: "src/books/52401_yoko.txt" },
+    { id: "musashi_08", title: "宮本武蔵 08 円明の巻", cardId: 52402, path: "src/books/52402_yoko.txt" }
   ];
   ```
 * **データの取得アルゴリズム (`loadPredefinedBook(bookId)`)**:
@@ -224,7 +224,7 @@ function restoreScrollPosition() {
 
 テーマやカスタマイズ設定は、CSSのクラス切り替えとカスタムプロパティ（CSS変数）により実現されます。
 
-### 5.1 テーマ変数マッピング ([style.css](/style.css))
+### 5.1 テーマ変数マッピング ([style.css](/src/css/style.css))
 
 | CSS変数名 | `:root` (和紙/Sepia) | `.theme-light` (明) | `.theme-dark` (暗) | `.theme-black` (漆黒) |
 | :--- | :--- | :--- | :--- | :--- |

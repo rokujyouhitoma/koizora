@@ -152,8 +152,8 @@ flowchart TD
 * **インプット**: [low_level_design.md](/docs/low_level_design.md)
 * **主要成果物**:
   * [index.html](/index.html) （アプリ構造およびマークアップ）
-  * [style.css](/style.css) （デザイン・テーマ・マルチカラム定義）
-  * [app.js](/app.js) （デコード・パース・スクロールイベント等のロジック）
+  * [style.css](/src/css/style.css) （デザイン・テーマ・マルチカラム定義）
+  * [app.js](/src/js/app.js) （デコード・パース・スクロールイベント等のロジック）
   * **検証用青空文庫テストファイル** （手動またはスクリプトによるパース挙動確認用のテスト用 `.txt`/`.html` データ）
 
 ### 3.6 システム検証およびリリース (System Verification & Release)
