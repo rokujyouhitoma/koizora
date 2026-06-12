@@ -415,6 +415,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Trim empty lines from the end of parsedLines to prevent trailing blank spaces
+        while (parsedLines.length > 0 && parsedLines[parsedLines.length - 1] === '<p class="empty-line">&nbsp;</p>') {
+            parsedLines.pop();
+        }
+        // Also trim from the start to clean up leading empty space
+        while (parsedLines.length > 0 && parsedLines[0] === '<p class="empty-line">&nbsp;</p>') {
+            parsedLines.shift();
+        }
+
         // Wrap paragraphs
         let bodyContent = parsedLines.join('\n');
 

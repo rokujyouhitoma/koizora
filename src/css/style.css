@@ -459,6 +459,7 @@ a:hover {
     text-orientation: mixed;
     -webkit-text-orientation: mixed;
     direction: ltr; /* Ensure vertical text always flows top-to-bottom and is top-aligned */
+    width: max-content; /* Size container to fit all columns exactly, preventing trailing blank pages */
     
     height: 100%;
     /* Create multi-column layout for horizontal paging */
