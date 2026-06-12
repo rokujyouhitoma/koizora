@@ -165,13 +165,15 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
   $$\text{pageCount} = \text{round}\left( \frac{\text{scrollWidth}}{\text{clientWidth}} \right)$$
 - **現在ページ番号 (`currentPage`)**:
   $$\text{currentPage} = \text{round}\left( \frac{\text{currentScroll}}{\text{clientWidth}} \right) + 1$$
-- **進捗バークリック位置からの進捗率算出**:
+- **進捗バークリック・ドラッグ（スクラブ）位置からの進捗率算出**:
+  マウスのドラッグ開始時（`mousedown`）またはタッチ操作の開始時（`touchstart`）に、ドラッグ状態フラグ `isDraggingProgress` を `true` に設定し、コンテナに `.dragging` クラスを付与してリアルタイムに進捗率を算出・スクロール位置へ即時反映します。
   $$\text{bookmarkProgress} = \frac{\text{clientX} - \text{rect.left}}{\text{rect.width}}$$
+  ドラッグ終了（`mouseup` / `touchend`）時にフラグを `false` に戻し、変更された進捗率のしおりを永続化（`saveBookmark`）します。
 - **指定ページジャンプからの進捗率算出**:
   $$\text{bookmarkProgress} = \frac{\text{targetPage} - 1}{\text{pageCount} - 1} \quad (\text{if pageCount} > 1)$$
 
 ### 3.2 ページ送り（ナビゲーション）
-設定されている読書方向（`config.direction`）に応じて、画面タップエリア、キーボード矢印キー、およびスクロール方向が連動して変化します。
+設定されている読書方向（`config.direction`）およびスワイプジェスチャー等の入力デバイスに応じて、画面タップエリア、キーボード矢印キー、スワイプ操作が連動します。
 
 * **右から左（RTL）時のページめくり方向**:
   * **次ページ（左方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} - \text{clientWidth}$ (左へスクロール)
@@ -179,6 +181,10 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
 * **左から右（LTR）時のページめくり方向**:
   * **次ページ（右方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} + \text{clientWidth}$ (右へスクロール)
   * **前ページ（左方向）**: $\text{scrollLeft} \leftarrow \text{scrollLeft} - \text{clientWidth}$ (左へスクロール)
+* **タッチスワイプ（1ページ送り制限）**:
+  画面の横スクロール（慣性スクロール）をCSSで無効化（`overflow-x: hidden`）したうえで、`touchstart`、`touchmove`、`touchend` によるタッチ位置座標の変化（水平移動量 $\Delta x$ と垂直移動量 $\Delta y$）を用いてスワイプを検知します。
+  * **右スワイプ ($\Delta x > 50$ 且つ $\left|\Delta x\right| > \left|\Delta y\right|$)**: `prevPage()` を呼び出し、直前の1ページへ戻る。
+  * **左スワイプ ($\Delta x < -50$ 且つ $\left|\Delta x\right| > \left|\Delta y\right|$)**: `nextPage()` を呼び出し、直後の1ページへ進む。
 
 ### 3.3 レイアウト変更時の位置復元とリフロー保護 (`isReflowing`)
 リサイズやフォントサイズ、読書方向の変更時には、段組み寸法が変化して一時的に不規則なスクロールイベントが発生します。これを無視し元の位置を正確に維持するため、`isReflowing` 状態フラグで制御を行います。
