@@ -463,7 +463,7 @@ a:hover {
     z-index: 1;
     overflow-x: hidden;
     overflow-y: hidden;
-    padding: 0 var(--reader-padding-x);
+    padding: 0; /* padding is moved to .reader-content to prevent scroll end cutoff */
     /* CSS Scroll Snap for page alignment */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -499,6 +499,8 @@ a:hover {
     height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
     margin-top: var(--reader-padding-top);
     margin-bottom: var(--reader-padding-bottom);
+    padding-left: var(--reader-padding-x);
+    padding-right: var(--reader-padding-x);
     
     text-align: justify;
     line-break: strict;
@@ -514,7 +516,7 @@ a:hover {
     height: 100%;
     width: max-content;
     column-fill: auto;
-    column-gap: 80px; /* Space between pages */
+    column-gap: calc(var(--reader-padding-x) * 2); /* Perfect page break alignment */
 }
 
 /* Ensure vertical text always flows top-to-bottom and is top-aligned */
@@ -522,21 +524,28 @@ a:hover {
     direction: ltr;
 }
 
+/* Margin between consecutive sections to align page breaks exactly with 100vw viewport scroll steps */
+.direction-rtl .reader-section + .reader-section {
+    margin-right: calc(var(--reader-padding-x) * 2);
+}
+.direction-ltr .reader-section + .reader-section {
+    margin-left: calc(var(--reader-padding-x) * 2);
+}
+
 /* Set page column width to match viewport height-based ratio */
 @media (min-width: 768px) {
     .reader-section {
-        column-width: 50vw; /* Column width takes half of the screen width */
+        column-width: calc(50vw - var(--reader-padding-x) * 2); /* Fit exactly 2 columns per page view */
     }
 }
 @media (max-width: 767px) {
     :root {
         --reader-padding-top: 88px; /* 64px header + 24px padding */
         --reader-padding-bottom: 64px; /* 40px footer + 24px padding */
-        --reader-padding-x: 20px;
+        --reader-padding-x: 24px; /* Slightly wider mobile margins for premium readability */
     }
     .reader-section {
         column-width: calc(100vw - var(--reader-padding-x) * 2); /* Strictly force single column */
-        column-gap: calc(var(--reader-padding-x) * 2);
     }
 }
 

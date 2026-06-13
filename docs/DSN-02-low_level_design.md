@@ -293,14 +293,9 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 #### モバイル制限 (画面幅767px以下)
 * **Viewportパディングの削減**: 
-  左右のパディング幅を狭め、表示領域を最大化します。
-  ```css
-  .reader-viewport {
-      padding: 24px 20px;
-  }
-  ```
+  左右のパディング幅を狭めつつ可読性を確保するため、`--reader-padding-x` を 24px に設定します。
 * **単一カラム幅制限**:
-  画面の横幅から左右のパディング値（計40px）を差し引いた値を `column-width` に指定し、複数カラムが左右に並んで表示されるのを防ぎます。
+  画面の横幅から左右のパディング値（計48px）を差し引いた値を `column-width` に指定し、複数カラムが左右に並んで表示されるのを防ぎます。
   ```css
   .reader-section {
       column-width: calc(100vw - var(--reader-padding-x) * 2);
@@ -310,17 +305,19 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 #### 垂直方向の上寄せ配置 (上寄せアライメント)
 * **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。また、親要素に `padding` を設定して `height: 100%` を子要素に与えると、ブラウザがスクロールバーやパディングを誤って計算し、テキスト下部が画面外（ビューポート外）に押し出されて描画される問題が生じます。
-* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウト（`position: absolute; inset: 0`）に変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。子要素 `.reader-content` の高さは `height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom))` とし、同じ値の `margin-top` / `margin-bottom` を設定することで、親要素の高さ（画面全体高）に完璧に適合させつつ、ヘッダー/フッターとの干渉を防ぎ上揃えで描画させます。
+* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウト（`position: absolute; inset: 0`）に変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`, `--reader-padding-x`）として定義します。スクロール末尾におけるブラウザのパディング消失バグを防ぐため、コンテナのパディングは `0` とし、子要素である `.reader-content` 自体に左右パディングを適用します。
   ```css
   .reader-viewport {
       position: absolute;
       inset: 0;
-      padding: 0 var(--reader-padding-x);
+      padding: 0; /* スクロールコンテナのパディングを0化 */
   }
   .reader-content {
       height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
       margin-top: var(--reader-padding-top);
       margin-bottom: var(--reader-padding-bottom);
+      padding-left: var(--reader-padding-x);
+      padding-right: var(--reader-padding-x);
   }
   ```
 
@@ -379,9 +376,14 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 ### 5.8 ページ境界での文章の左右見切れ・ページ分割防止対策
 
-* **原因**: 縦書きマルチカラムレイアウトにおいて、段落（`<p>`）や見出し（`h1`〜`h5`）の要素がカラム（ページ）の境界にまたがって分割される際、ブラウザのフォントレンダリングやパディング計算の差異によって、境界付近の文字の左右（または上下）が見切れる（欠ける）現象が発生します。また、短い段落や見出しがページをまたいで不自然に分割されるのは、可読性を損ねる原因となります。
-* **対策**: 読書画面内の各テキストブロック（`<p>`）および見出し（`<h1>`〜`<h5>`）に対し、改段・改ページを防止する CSS プロパティ `break-inside: avoid` およびその互換用プロパティを適用します。これにより、要素全体がページ内に収まらない場合は、自動的に丸ごと次のページ（次のカラム）へ送られるようになります。
+* **原因**: 
+  1. 縦書きマルチカラムレイアウトにおいて、段落（`<p>`）や見出し（`h1`〜`h5`）の要素がカラム（ページ）の境界にまたがって分割される際、ブラウザのフォントレンダリングやパディング計算の差異によって、境界付近の文字の左右（または上下）が見切れる（欠ける）現象が発生します。
+  2. 改ページコード（`［＃改ページ］`）によって分割された複数の `.reader-section` 要素が並列配置された際、コンテナ左右余白分（`var(--reader-padding-x)`）が累積され、2つ目以降のセクションがビューポート幅（`100vw`）のグリッドから横方向にずれて表示されていました。これにより、文章の左右が見切れていました。
+* **対策**: 
+  1. 読書画面内の各テキストブロック（`<p>`）および見出し（`<h1>`〜`<h5>`）に対し、改段・改ページを防止する CSS プロパティ `break-inside: avoid` およびその互換用プロパティを適用します。
+  2. 改ページをまたぐ連続するセクション（`.reader-section + .reader-section`）に対し、レイアウト進行方向（RTL または LTR）のブロック開始端マージン（RTL時は `margin-right`、LTR時は `margin-left`）として `calc(var(--reader-padding-x) * 2)` を付与します。これにより、全セクションの開始位置がビューポートの1ページ境界（`100vw` の整数倍）と完全に同期され、スクロールによる見切れを完全に排除します。
   ```css
+  /* 改段・改ページ防止 */
   .reader-content p,
   .reader-content h1,
   .reader-content h2,
@@ -391,6 +393,14 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
       break-inside: avoid;
       -webkit-column-break-inside: avoid;
       page-break-inside: avoid;
+  }
+
+  /* セクション間のレイアウトずれ補正（RTL / LTR別） */
+  .direction-rtl .reader-section + .reader-section {
+      margin-right: calc(var(--reader-padding-x) * 2);
+  }
+  .direction-ltr .reader-section + .reader-section {
+      margin-left: calc(var(--reader-padding-x) * 2);
   }
   ```
 
