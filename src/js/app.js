@@ -1031,4 +1031,11 @@ document.addEventListener('DOMContentLoaded', () => {
             hideControls();
         }
     }
+
+    // Expose core functions for testing/debugging
+    window.Yuzora = {
+        parseAozoraText,
+        formatAozoraMarkup,
+        config
+    };
 });

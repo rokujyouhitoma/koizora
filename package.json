@@ -1,0 +1,30 @@
+{
+  "name": "yuzora",
+  "version": "1.0.0",
+  "description": "青空文庫のテキストファイル（.txt）やXHTMLファイル（.html）をブラウザへドラッグ＆ドロップするだけで、美しい縦書き表示に変換し、快適に読書ができるクライアントサイド専用の静的Web SPAビューアーです。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test:unit": "node --test tests/unit/app.test.js",
+    "test:e2e": "playwright test",
+    "test": "npm run test:unit && npm run test:e2e"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rokujyouhitoma/yuzora.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rokujyouhitoma/yuzora/issues"
+  },
+  "homepage": "https://github.com/rokujyouhitoma/yuzora#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "http-server": "^14.1.1",
+    "jsdom": "^22.1.0"
+  }
+}
