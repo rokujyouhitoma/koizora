@@ -53,4 +53,40 @@ test.describe('Yuzora E2E Reader Tests', () => {
         const body = page.locator('body');
         await expect(body).toHaveClass(/theme-dark/);
     });
+
+    test('should maintain safety margin for the last line of the last page to prevent clipping', async ({ page }) => {
+        // Open the first book card
+        const bookCard = page.locator('#developer-books-grid .book-card').first();
+        await bookCard.click();
+
+        // Wait for reader screen
+        const readerScreen = page.locator('#reader-screen');
+        await expect(readerScreen).toBeVisible();
+
+        // Wait for content to load
+        await page.waitForSelector('#reader-content p');
+
+        // Scroll all the way to the left (end of the book)
+        await page.evaluate(() => {
+            const viewport = document.getElementById('reader-viewport');
+            viewport.scrollLeft = -(viewport.scrollWidth - viewport.clientWidth);
+        });
+
+        // Wait for smooth scrolling to settle
+        await page.waitForFunction(() => {
+            const viewport = document.getElementById('reader-viewport');
+            const target = -(viewport.scrollWidth - viewport.clientWidth);
+            return Math.abs(viewport.scrollLeft - target) < 2;
+        });
+
+        // Get viewport and last paragraph bounding boxes
+        const viewportBox = await page.locator('#reader-viewport').boundingBox();
+        const lastParagraph = page.locator('#reader-content p').last();
+        const lastParagraphBox = await lastParagraph.boundingBox();
+
+        // The leftmost edge of the last paragraph should be at least 15px inside the viewport
+        const leftMargin = lastParagraphBox.x - viewportBox.x;
+        console.log(`Last paragraph left margin: ${leftMargin}px`);
+        expect(leftMargin).toBeGreaterThanOrEqual(15);
+    });
 });

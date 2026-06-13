@@ -506,7 +506,10 @@ a:hover {
     margin-inline-start: var(--reader-padding-top);
     margin-inline-end: var(--reader-padding-bottom);
     padding-inline: 0;
-    padding-block: var(--reader-viewport-padding-x);
+    padding-block: 0;
+    border-inline: none;
+    border-block-start: var(--reader-viewport-padding-x) solid transparent;
+    border-block-end: var(--reader-viewport-padding-x) solid transparent;
     column-gap: calc(var(--reader-viewport-padding-x) * 2);
     
     text-align: justify;
