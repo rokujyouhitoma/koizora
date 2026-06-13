@@ -99,6 +99,74 @@ sequenceDiagram
     deactivate C
 ```
 
+### 2.3 画面構成要素一覧 (UI Screen Component Breakdown)
+
+本アプリケーションを構成する主要な3画面のDOM・UI構成要素、対応する識別子（ID/クラス名）、およびそれぞれの論理的な役割は以下の通りです。
+
+#### 1. ウェルカム画面 (Welcome Screen)
+ファイル未読み込み時の初期画面です。画面全体のコンテナ要素は `#welcome-screen`（クラス名: `.welcome-screen`）です。
+
+| 構成要素名 | 識別子 (ID / Class) | 親要素 | 役割・機能説明 |
+| :--- | :--- | :--- | :--- |
+| **カードコンテナ** | `.welcome-card` | `#welcome-screen` | ウェルカム画面のコンテンツ全体を中央配置で内包するボックス。 |
+| **ロゴ領域** | `.logo` | `.welcome-card` | アプリケーションのロゴおよびサブタイトルを表示する領域。 |
+| ├ ロゴテキスト | `.logo-text` | `.logo` | 「ゆうぞら」のロゴ文字列表示。 |
+| └ サブタイトル | `.logo-sub` | `.logo` | 「青空文庫 縦書きビューアー」の表示。 |
+| **説明文** | `.description` | `.welcome-card` | アプリケーションの概要およびドラッグ＆ドロップ動作を説明するテキスト。 |
+| **ドロップゾーン** | `#drop-zone` / `.drop-zone` | `.welcome-card` | ファイルのドロップイベントを待ち受ける枠線付きのドラッグエリア。 |
+| ├ アイコン | `.icon-upload` | `#drop-zone` | アップロードを視覚的に表現するSVGアイコン。 |
+| ├ ドラッグ案内 | `.drop-text` | `#drop-zone` | 「ファイルをここにドラッグ＆ドロップ」の文字列表示。 |
+| ├ 接続詞 | `.drop-or` | `#drop-zone` | 「または」の文字列表示。 |
+| └ ファイル選択ボタン | `label.btn-primary` | `#drop-zone` | クリックでファイルブラウザを起動する装飾ボタン。 |
+| **ファイルインプット** | `#file-input` | `label` 内 | `<input type="file" accept=".txt,.html,.xhtml">`（CSSで実体は非表示）。 |
+| **事前定義作品セクション** | `.predefined-books-section`| `.welcome-card` | ローカルにファイルがないユーザー向けの名作選択領域。 |
+| ├ セクションタイトル | `.section-title` | `.predefined-books-section`| 「名作を読む（吉川英治「宮本武蔵」）」の文字列表示。 |
+| └ 作品グリッド | `#predefined-books-grid` / `.predefined-books-grid` | `.predefined-books-section`| JavaScriptにより、定義済みの作品カードが動的に流し込まれるコンテナ。 |
+| **作品カード** | `.book-card` (動的生成) | `#predefined-books-grid` | 個々の作品を選択するためのボタン型カード要素。 |
+| ├ カバー | `.book-card-cover` | `.book-card` | 本の表紙を模した、和風の縦書きタイトル表示領域。 |
+| └ メタ情報 | `.book-card-meta` | `.book-card` | 作品情報等を横書きで表示する領域。 |
+| **ヘルプセクション** | `.help-section` | `.welcome-card` | 青空文庫からのダウンロード手順・利用方法を説明する領域。 |
+
+#### 2. 読書画面 (Reader Screen)
+ファイルを読み込んだ後に遷移するメインの閲覧画面です。画面全体のコンテナ要素は `#reader-screen`（クラス名: `.reader-screen`）であり、未ロード時は `.hidden` クラスによって非表示化されます。
+
+| 構成要素名 | 識別子 (ID / Class) | 親要素 | 役割・機能説明 |
+| :--- | :--- | :--- | :--- |
+| **ヘッダーコントロール** | `.reader-header` | `#reader-screen` | 画面上部の操作・表示ヘッダー。マウス移動やタップで一時表示され、自動フェードアウトする。 |
+| ├ ホーム戻るボタン | `#btn-back` / `.btn-icon` | `.reader-header` | 文字記号 `⌂`。クリック時に読書画面を閉じ、ウェルカム画面へと戻る。 |
+| ├ 作品タイトル表示 | `#book-title` / `.book-title` | `.reader-header` | 読み込み中の作品名（またはファイル名）を中央に表示する領域。 |
+| └ 右側コントロール | `.right-controls` | `.reader-header` | ヘッダー右側に配置される操作ボタン群。 |
+| 　├ 最初へボタン | `#btn-first-page` / `.btn-icon`| `.right-controls` | SVGアイコン。ワンクリックで作品の先頭（最初のページ）へジャンプする。 |
+| 　└ 表示設定ボタン | `#btn-settings` / `.btn-icon` | `.right-controls` | SVG（歯車）アイコン。クリック時に設定ドロワーを起動する。 |
+| **読書ビューポート** | `#reader-viewport` / `.reader-viewport` | `#reader-screen` | スクロールやスワイプを検知し、表示範囲を制限するメイン表示窓（`overflow-x: hidden`）。 |
+| └ 本文表示コンテナ | `#reader-content` / `.reader-content` | `#reader-viewport` | パースされた縦書きHTMLが動的に流し込まれるコンテナ。テーマやフォント等の設定クラスが動的に付与される。 |
+| **ページナビゲーション** | `.page-nav` (左右共通) | `#reader-screen` | 画面左右の両端（全高）にオーバーレイされた透明なクリック/タップターゲット。 |
+| ├ 左側タップエリア | `#page-nav-left` / `.page-nav-left`| `#reader-screen` | 左側のタップエリア。「次のページへ」を割り当て（RTL時）。 |
+| └ 右側タップエリア | `#page-nav-right` / `.page-nav-right`| `#reader-screen` | 右側のタップエリア。「前のページへ」を割り当て（RTL時）。 |
+| **フッターコントロール** | `.reader-footer` | `#reader-screen` | 画面下部に配置される進捗コントロール。ヘッダーと同様に自動フェードアウトする。 |
+| ├ 進捗バーコンテナ | `.progress-bar-container` | `.reader-footer` | 進捗バーを配置する外枠。 |
+| 　├ 進捗バートラック | `#progress-bar` / `.progress-bar` | `.progress-bar-container` | 進捗を示す横バー。クリック・ドラッグ（スクラブ）による位置移動を検知。 |
+| 　└ 進捗つまみ | `#progress-thumb` / `.progress-thumb` | `#progress-bar` | 現在位置を視覚化する進捗バー上の丸形インジケータ。 |
+| └ フッター情報表示 | `.footer-info` | `.reader-footer` | テキストによる進捗状況の表示。 |
+| 　├ 読了進捗率 | `#reading-percentage` | `.footer-info` | 現在位置の読了割合（「〇%」）を表示。 |
+| 　└ ページ数表示 | `#reading-index` | `.footer-info` | 現在のページ位置と総ページ数（「〇 / 〇 ページ」）を表示。 |
+
+#### 3. 設定ドロワー (Settings Drawer)
+読書画面の設定ボタンで起動するサイドメニューです。ドロワー本体は `#settings-drawer`（クラス名: `.settings-drawer`）で、背面には暗幕 `#drawer-overlay`（クラス名: `.drawer-overlay`）がオーバーレイされます。
+
+| 構成要素名 | 識別子 (ID / Class) | 親要素 | 役割・機能説明 |
+| :--- | :--- | :--- | :--- |
+| **ドロワーヘッダー** | `.drawer-header` | `#settings-drawer` | ドロワー最上部のタイトルおよびクローズ領域。 |
+| ├ ドロワータイトル | `h2` | `.drawer-header` | 「表示設定」のテキスト表示。 |
+| └ 閉じるボタン | `#btn-close-settings` / `.btn-icon`| `.drawer-header` | SVG（×）アイコン。クリック時にドロワーおよび背面暗幕を閉じる。 |
+| **ドロワーコンテンツ** | `.drawer-content` | `#settings-drawer` | スタイル調整用セレクターを格納するスクロール可能な設定グループ群。 |
+| ├ テーマ設定 | `.settings-group` (テーマ用) | `.drawer-content` | 背景色・カラーテーマ（和紙、明、暗、漆黒）を切り替えるボタン群。 |
+| ├ 書体設定 | `.settings-group` (書体用) | `.drawer-content` | 表示フォント（明朝体、ゴシック体）を切り替えるボタン群。 |
+| ├ ページ送り方向 | `.settings-group` (送り方向用) | `.drawer-content` | ページの進行・スクロール方向（右から左、左から右）を切り替えるボタン群。 |
+| ├ 文字サイズ設定 | `.settings-group` (サイズ用) | `.drawer-content` | 文字サイズ（小、中、大、特大）を切り替えるボタン群。 |
+| ├ 行間設定 | `.settings-group` (行間用) | `.drawer-content` | カラム内の行送り幅（狭い、標準、広い）を切り替えるボタン群。 |
+| └ 文字間設定 | `.settings-group` (文字間用) | `.drawer-content` | 各文字の間隔（狭い、標準、広い）を切り替えるボタン群。 |
+
 ---
 
 ## 3. UI/UX・デザインシステム (UI/UX & Design System)
