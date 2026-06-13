@@ -6,6 +6,8 @@ const path = require('path');
 
 test.describe('Yuzora Parser Unit Tests', () => {
     let window;
+    let activeIntervals = [];
+    let activeTimeouts = [];
 
     test.before(() => {
         // Setup JSDOM
@@ -17,6 +19,22 @@ test.describe('Yuzora Parser Unit Tests', () => {
         window = dom.window;
         global.document = window.document;
         global.window = window;
+
+        // Mock setInterval to avoid hanging timers in Node process
+        const originalSetInterval = window.setInterval;
+        window.setInterval = (fn, delay) => {
+            const id = originalSetInterval(fn, delay);
+            activeIntervals.push(id);
+            return id;
+        };
+
+        // Mock setTimeout
+        const originalSetTimeout = window.setTimeout;
+        window.setTimeout = (fn, delay) => {
+            const id = originalSetTimeout(fn, delay);
+            activeTimeouts.push(id);
+            return id;
+        };
 
         // Load app.js code
         const appJsCode = fs.readFileSync(path.resolve(__dirname, '../../src/js/app.js'), 'utf8');
@@ -31,6 +49,9 @@ test.describe('Yuzora Parser Unit Tests', () => {
 
     test.after(() => {
         if (window) {
+            // Clear all registered JSDOM timers to allow Node to exit cleanly
+            activeIntervals.forEach(id => window.clearInterval(id));
+            activeTimeouts.forEach(id => window.clearTimeout(id));
             window.close();
         }
     });

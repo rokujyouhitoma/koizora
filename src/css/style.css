@@ -499,13 +499,14 @@ a:hover {
     -webkit-text-orientation: mixed;
     /* direction is inherited dynamically to control column progression direction */
     display: block;
-    width: max-content; /* Size container to fit all columns exactly */
+    block-size: max-content; /* Size container block-size to fit all columns exactly */
     column-fill: auto;
     
-    height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
-    margin-top: var(--reader-padding-top);
-    margin-bottom: var(--reader-padding-bottom);
-    padding: 0 var(--reader-viewport-padding-x);
+    inline-size: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
+    margin-inline-start: var(--reader-padding-top);
+    margin-inline-end: var(--reader-padding-bottom);
+    padding-inline: 0;
+    padding-block: var(--reader-viewport-padding-x);
     column-gap: calc(var(--reader-viewport-padding-x) * 2);
     
     text-align: justify;
