@@ -10,7 +10,7 @@
     --reader-padding-top: 104px; /* 64px header + 40px padding */
     --reader-padding-bottom: 80px; /* 40px footer + 40px padding */
     --reader-padding-x: 60px;
-    --reader-viewport-padding-x: 16px;
+    --reader-viewport-padding-x: 24px;
     
     /* Theme Defaults (Sepia / 和紙) */
     --bg-app: #f5eedc;
@@ -537,7 +537,7 @@ a:hover {
 /* Set page column width to match viewport height-based ratio */
 @media (min-width: 768px) {
     :root {
-        --reader-viewport-padding-x: 20px;
+        --reader-viewport-padding-x: 40px;
     }
     .reader-content {
         column-width: calc(50% - var(--reader-viewport-padding-x) * 2);

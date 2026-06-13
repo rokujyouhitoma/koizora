@@ -295,7 +295,7 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 * **Viewportマージンによる余白の静的確保**: 
   左右のパディング幅を狭めつつ十分な静的余白を確保するため、`--reader-padding-x` を 24px に設定します。
 * **単一カラム幅制限と安全パディング**:
-  スクロールコンテナである `.reader-viewport` が画面端から `var(--reader-padding-x)` 引き込んで配置されます。本流設計として、文字の左端の見切れ（ブラウザのスクロール限界でのコンテナパディング切り捨てバグ）を防ぐため、安全パディング `--reader-viewport-padding-x: 16px` を `.reader-viewport` ではなく、単一のコンテンツラッパー `.reader-content` 自身に適用します。コンテナ側は `padding: 0` にリセットします。
+  スクロールコンテナである `.reader-viewport` が画面端から `var(--reader-padding-x)` 引き込んで配置されます。本流設計として、文字の左端の見切れ（ブラウザのスクロール限界でのコンテナパディング切り捨てバグ）を防ぐため、安全パディング `--reader-viewport-padding-x`（モバイル: 24px、PC: 40px）を `.reader-viewport` ではなく、単一のコンテンツラッパー `.reader-content` 自身に適用します。コンテナ側は `padding: 0` にリセットします。
   ビューポート内の幅をそのまま占有するよう、カラム幅は `column-width: calc(100% - var(--reader-viewport-padding-x) * 2)` に指定し、複数カラムが左右に並んで表示されるのを完全に防ぎます。また、カラム間隙間（`column-gap`）には内部パディングの2倍を設定し、横スクロールによるページ送り幅と物理幅を完全に同期させます。
   ```css
   .reader-content {
@@ -387,7 +387,7 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 * **対策**: 
   1. 読書画面内の見出し（`<h1>`〜`<h5>`）に対し、改段・改ページを防止する CSS プロパティ `break-inside: avoid` およびその互換用プロパティを適用します。通常の段落（`<p>`）は、各ページ間で自然に分割されるようにします。
   2. ドキュメント全体を単一のマルチカラムコンテナ（`.reader-content`）に格納し、改ページ（改段）位置には `<div class="page-break"></div>` を挿入して `break-before: column` を適用し、ブラウザによるネイティブで正確な改段制御を行います。
-  3. スクロール限界でのパディング消失を防ぐ本流設計として、安全余白パディング（`--reader-viewport-padding-x`、モバイル: 16px、PC: 20px）をコンテナ自身に直接適用し、カラム幅（`column-width`）とカラム隙間（`column-gap`）を以下の数式に基づいて設定し、スクロール量と完全に同期させます。
+  3. スクロール限界でのパディング消失を防ぐ本流設計として、安全余白パディング（`--reader-viewport-padding-x`、モバイル: 24px、PC: 40px）をコンテナ自身に直接適用し、カラム幅（`column-width`）とカラム隙間（`column-gap`）を以下の数式に基づいて設定し、スクロール量と完全に同期させます。
      - モバイル時（画面幅767px以下）: `column-width: calc(100% - var(--reader-viewport-padding-x) * 2); column-gap: calc(var(--reader-viewport-padding-x) * 2);`
      - PC時（画面幅768px以上）: `column-width: calc(50% - var(--reader-viewport-padding-x) * 2); column-gap: calc(var(--reader-viewport-padding-x) * 2);`
   ```css
