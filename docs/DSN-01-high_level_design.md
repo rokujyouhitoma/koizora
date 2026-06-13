@@ -166,6 +166,23 @@ sequenceDiagram
 | ├ 文字サイズ設定 | `.settings-group` (サイズ用) | `.drawer-content` | 文字サイズ（小、中、大、特大）を切り替えるボタン群。 |
 | ├ 行間設定 | `.settings-group` (行間用) | `.drawer-content` | カラム内の行送り幅（狭い、標準、広い）を切り替えるボタン群。 |
 | └ 文字間設定 | `.settings-group` (文字間用) | `.drawer-content` | 各文字の間隔（狭い、標準、広い）を切り替えるボタン群。 |
+| └ 開発者向け設定 | `.settings-group.dev-section` | `.drawer-content` | デバッグモーダルを起動する「デバッグ画面を開く」ボタン（`#btn-open-debug`）を内包する領域。 |
+
+#### 4. デバッグモーダル (Debug Modal)
+開発者向けのアプリ状態モニターおよび `localStorage` 操作を行うモーダル画面です。コンテナ要素は `#debug-modal`（クラス名: `.debug-modal`）で、背面には暗幕 `#debug-modal-overlay`（クラス名: `.debug-modal-overlay`）がオーバーレイされます。
+
+| 構成要素名 | 識別子 (ID / Class) | 親要素 | 役割・機能説明 |
+| :--- | :--- | :--- | :--- |
+| **モーダルヘッダー** | `.debug-modal-header` | `#debug-modal` | タイトルと閉じるボタンの領域。 |
+| ├ タイトル | `h2` | `.debug-modal-header` | 「デバッグ情報 & 操作」のテキスト表示。 |
+| └ 閉じるボタン | `#btn-close-debug` / `.btn-icon`| `.debug-modal-header` | モーダルを閉じるボタン。 |
+| **モーダルボディ** | `.debug-modal-body` | `#debug-modal` | 内部状態と操作用のボタン群。 |
+| ├ 状態モニター | `.debug-modal-section` (モニター用) | `.debug-modal-body` | アプリの状態変数をリアルタイム表示する領域。 |
+| 　└ モニタープレビュー | `#debug-monitor` | `.debug-monitor-container` | JSON化した内部状態のテキストプレビュー。 |
+| └ 操作パネル | `.debug-modal-section` (操作用) | `.debug-modal-body` | `localStorage` の初期化を行うボタン群。 |
+| 　├ しおり初期化ボタン | `#btn-clear-bookmarks` | `.debug-buttons` | クリック時に読書履歴や各作品の進捗データを削除。 |
+| 　├ 設定初期化ボタン | `#btn-clear-config` | `.debug-buttons` | クリック時に表示カスタマイズ設定をデフォルトにリセット。 |
+| 　└ 完全初期化ボタン | `#btn-clear-all` | `.debug-buttons` | 全ての `localStorage` をクリアしてアプリを強制再読込。 |
 
 ---
 

@@ -376,3 +376,55 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
       left: auto;
   }
   ```
+
+---
+
+## 6. デバッグ機能設計仕様 (Debug Specifications)
+
+デバッグ画面（デバッグモーダル）は、アプリケーションの実行状態を監視し、永続化されたストレージデータを段階的に初期化するための機能です。
+
+### 6.1 アプリ内部状態モニター仕様
+
+`updateDebugMonitor` 関数により、現在のアプリケーションの状態変数およびビューポートの物理寸法を収集し、JSON文字列として `#debug-monitor` 要素へ反映します。
+デバッグ画面が表示されている間は、`setInterval` により **1000ms（1秒間隔）** で自動的にデータがリフレッシュされます。
+
+#### 収集対象パラメータスキーマ
+```json
+{
+  "state": {
+    "currentFileName": "string (読み込み中のファイル名 / 未ロード時は空文字)",
+    "currentFileType": "string (txt | html | 空文字)",
+    "bookmarkProgress": "string (進捗率のパーセンテージ表記。例: 45.2%)",
+    "currentPage": "number (現在ページ番号。スクロール位置から算出)",
+    "pageCount": "number (総ページ数。スクロール幅から算出)"
+  },
+  "viewport": {
+    "clientWidth": "number (表示領域幅 px)",
+    "clientHeight": "number (表示領域高 px)",
+    "scrollWidth": "number (コンテンツ全体のスクロール幅 px)",
+    "scrollLeft": "number (現在のスクロール量 px。RTL時はマイナス値)"
+  },
+  "config": {
+    "theme": "string (テーマ名)",
+    "font": "string (書体名)",
+    "size": "string (文字サイズクラス)",
+    "lh": "string (行間クラス)",
+    "spacing": "string (文字間クラス)",
+    "direction": "string (rtl | ltr)"
+  },
+  "localStorageKeys": [
+    "string (現在 localStorage に保存されている全キーの配列)"
+  ]
+}
+```
+
+### 6.2 localStorage 初期化仕様
+
+ユーザーがデバッグボタンを押下した際、確認のダイアログ（`confirm`）を表示した後、それぞれ対象のデータ範囲に対して初期化を実行します。
+
+| アクション名 | トリガー要素ID | 対象データ・キー | 挙動・後続処理 |
+| :--- | :--- | :--- | :--- |
+| **しおりデータ初期化** | `#btn-clear-bookmarks` | `last_read_file_name`<br>`last_read_file_type`<br>`last_read_file_content`<br>`bookmark_*` | 指定されたキーを `localStorage.removeItem()` で削除。しおりをクリア後、`window.location.reload()` でページをリロードする。 |
+| **表示設定初期化** | `#btn-clear-config` | `yuzora_config`<br>`koizora_config` | 設定関連のキーを削除。表示設定を初期状態にリセット後、`window.location.reload()` でリロードする。 |
+| **完全初期化** | `#btn-clear-all` | 全ての `localStorage` データ | `localStorage.clear()` を実行し、全データを完全削除。その後 `window.location.reload()` で初期起動状態に戻す。 |
+

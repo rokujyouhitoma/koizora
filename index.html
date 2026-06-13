@@ -178,12 +178,51 @@
                         <button class="spacing-btn" data-spacing="spacing-loose">広い</button>
                     </div>
                 </div>
+
+                <!-- Developer settings -->
+                <div class="settings-group dev-section" style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 20px;">
+                    <label>開発者向け</label>
+                    <button id="btn-open-debug" class="btn" style="width: 100%; background: var(--border-color); color: var(--text-main); margin-top: 8px;">デバッグ画面を開く</button>
+                </div>
             </div>
         </div>
 
+        <!-- Debug Screen (Modal) -->
+        <div id="debug-modal" class="debug-modal hidden">
+            <div class="debug-modal-content">
+                <div class="debug-modal-header">
+                    <h2>デバッグ情報 & 操作</h2>
+                    <button id="btn-close-debug" class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="debug-modal-body">
+                    <!-- Monitor Panel -->
+                    <div class="debug-modal-section">
+                        <h3>アプリ内部状態モニター</h3>
+                        <div class="debug-monitor-container">
+                            <pre id="debug-monitor">読み込み中...</pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Control Panel -->
+                    <div class="debug-modal-section">
+                        <h3>localStorage 操作</h3>
+                        <div class="debug-buttons">
+                            <button id="btn-clear-bookmarks" class="btn btn-secondary">しおりデータのみ初期化</button>
+                            <button id="btn-clear-config" class="btn btn-secondary">表示設定のみ初期化</button>
+                            <button id="btn-clear-all" class="btn btn-danger">すべて初期化してリロード</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="debug-modal-overlay" class="debug-modal-overlay hidden"></div>
+
         <!-- Overlay backdrop for settings drawer -->
         <div id="drawer-overlay" class="drawer-overlay"></div>
-        
     </div>
 
     <script src="src/js/app.js"></script>

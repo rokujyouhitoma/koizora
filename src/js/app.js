@@ -36,6 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Predefined Books Grid
     const predefinedBooksGrid = document.getElementById('predefined-books-grid');
 
+    // Debug Modal Elements
+    const btnOpenDebug = document.getElementById('btn-open-debug');
+    const debugModal = document.getElementById('debug-modal');
+    const btnCloseDebug = document.getElementById('btn-close-debug');
+    const debugModalOverlay = document.getElementById('debug-modal-overlay');
+    const debugMonitor = document.getElementById('debug-monitor');
+    const btnClearBookmarks = document.getElementById('btn-clear-bookmarks');
+    const btnClearConfig = document.getElementById('btn-clear-config');
+    const btnClearAll = document.getElementById('btn-clear-all');
+
     const PREDEFINED_BOOKS = [
         { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", shortTitle: "序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt" },
         { id: "musashi_02", title: "宮本武蔵 02 地の巻", shortTitle: "地の巻", cardId: 52396, path: "src/books/52396_yoko.txt" },
@@ -115,6 +125,109 @@ document.addEventListener('DOMContentLoaded', () => {
         currentFileContent = '';
         document.title = 'ゆうぞら - 青空文庫縦書きビューアー';
     });
+
+    // Debug Modal toggle & actions
+    if (btnOpenDebug) {
+        btnOpenDebug.addEventListener('click', () => {
+            closeSettings(); // close drawer
+            debugModal.classList.remove('hidden');
+            debugModalOverlay.classList.remove('hidden');
+            updateDebugMonitor();
+        });
+    }
+
+    function closeDebugModal() {
+        debugModal.classList.add('hidden');
+        debugModalOverlay.classList.add('hidden');
+    }
+
+    if (btnCloseDebug) {
+        btnCloseDebug.addEventListener('click', closeDebugModal);
+    }
+    if (debugModalOverlay) {
+        debugModalOverlay.addEventListener('click', closeDebugModal);
+    }
+
+    function updateDebugMonitor() {
+        if (!debugMonitor) return;
+        
+        let currentPage = 0;
+        let pageCount = 0;
+        if (readerViewport) {
+            const maxScroll = readerViewport.scrollWidth - readerViewport.clientWidth;
+            const currentScroll = Math.abs(readerViewport.scrollLeft);
+            pageCount = Math.round(readerViewport.scrollWidth / readerViewport.clientWidth) || 0;
+            currentPage = maxScroll > 0 ? (Math.round(currentScroll / readerViewport.clientWidth) + 1) : (pageCount > 0 ? 1 : 0);
+        }
+
+        const monitorData = {
+            state: {
+                currentFileName: currentFileName || '(未ロード)',
+                currentFileType: currentFileType || '(なし)',
+                bookmarkProgress: bookmarkProgress ? `${(bookmarkProgress * 100).toFixed(1)}%` : '0%',
+                currentPage: currentPage,
+                pageCount: pageCount
+            },
+            viewport: {
+                clientWidth: readerViewport ? readerViewport.clientWidth : 0,
+                clientHeight: readerViewport ? readerViewport.clientHeight : 0,
+                scrollWidth: readerViewport ? readerViewport.scrollWidth : 0,
+                scrollLeft: readerViewport ? readerViewport.scrollLeft : 0
+            },
+            config: config,
+            localStorageKeys: Object.keys(localStorage)
+        };
+        debugMonitor.textContent = JSON.stringify(monitorData, null, 2);
+    }
+
+    // Periodically update debug monitor if visible
+    setInterval(() => {
+        if (debugModal && !debugModal.classList.contains('hidden')) {
+            updateDebugMonitor();
+        }
+    }, 1000);
+
+    // localStorage operations
+    if (btnClearBookmarks) {
+        btnClearBookmarks.addEventListener('click', () => {
+            if (confirm('しおりデータ（読書履歴および進捗）をすべて初期化しますか？')) {
+                // Delete last read info
+                localStorage.removeItem('last_read_file_name');
+                localStorage.removeItem('last_read_file_type');
+                localStorage.removeItem('last_read_file_content');
+                // Loop and remove bookmark_* keys
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('bookmark_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                alert('しおりデータを初期化しました。');
+                window.location.reload();
+            }
+        });
+    }
+
+    if (btnClearConfig) {
+        btnClearConfig.addEventListener('click', () => {
+            if (confirm('表示設定（テーマ、文字サイズ、行間等）をすべて初期化しますか？')) {
+                localStorage.removeItem('yuzora_config');
+                localStorage.removeItem('koizora_config');
+                alert('表示設定を初期化しました。');
+                window.location.reload();
+            }
+        });
+    }
+
+    if (btnClearAll) {
+        btnClearAll.addEventListener('click', () => {
+            if (confirm('すべてのデータ（しおり・設定等）を完全に削除してリロードしますか？\nこの操作は取り消せません。')) {
+                localStorage.clear();
+                alert('すべてのデータを削除しました。');
+                window.location.reload();
+            }
+        });
+    }
 
     // First Page Navigation
     if (btnFirstPage) {
