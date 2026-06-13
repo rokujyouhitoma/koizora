@@ -555,9 +555,6 @@ a:hover {
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 0; /* Clear default block margin */
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
 }
 
 /* Aozora specific headings and styles */
