@@ -81,4 +81,15 @@ test.describe('Yuzora Parser Unit Tests', () => {
         const result = window.Yuzora.parseAozoraText('タイトル\n著者\n-------------------------------------------------------\n本文第一段\n［＃改ページ］\n本文第二段');
         assert.ok(result.body.includes('<div class="page-break"></div>'));
     });
+
+    test('should parse headings (large, medium, small) and preserve rubies inside', () => {
+        const resultLarge = window.Yuzora.parseAozoraText('タイトル\n著者\n-------------------------------------------------------\n［＃２字下げ］上　先生と私［＃「上　先生と私」は大見出し］');
+        assert.ok(resultLarge.body.includes('<h2>上　先生と私</h2>'));
+
+        const resultMedium = window.Yuzora.parseAozoraText('タイトル\n著者\n-------------------------------------------------------\n［＃５字下げ］一［＃「一」は中見出し］');
+        assert.ok(resultMedium.body.includes('<h3>一</h3>'));
+
+        const resultWithRuby = window.Yuzora.parseAozoraText('タイトル\n著者\n-------------------------------------------------------\n［＃３字下げ］衆口《しゅうこう》［＃「衆口」は大見出し］');
+        assert.ok(resultWithRuby.body.includes('<h2><ruby>衆口<rt>しゅうこう</rt></ruby></h2>'));
+    });
 });

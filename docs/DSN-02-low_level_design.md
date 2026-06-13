@@ -50,7 +50,9 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
    - ルール：`-------------------------------------------------------`（ダッシュ境界）または `［＃` で始まる開始指示（目次や始まり）を検知するまで、または一定行（5行以上）を超えてテキストが始まるまで、ヘッダー行として描画対象から除外します。
 4. **メタデータ・フッター情報のクレンジング**: 
    - 行内に `底本：` または `青空文庫作成ファイル：` が検出された場合、それ以降の行は後書き・メタデータと判定し、ループ処理を即座にブレイクして除去します。
-5. **青空文庫記法の置換 (`formatAozoraMarkup`)**: 各行に対して下記のマークアップ置換（正規表現）を順次適用します。
+5. **見出し注記の検出・変換**: 
+   - 各行のマークアップ置換の前に、`［＃「([^」]+)」は(大|中|小)見出し］` 注記を検索します。検出された場合、大見出しは `<h2>`、中見出しは `<h3>`、小見出しは `<h4>` へとマッピングします。行内から見出し注記テキストを除去したうえで、残りのテキスト（見出し内のルビなどを含む）にマークアップ置換を適用し、最終的に見出しタグで囲んで出力します。
+6. **青空文庫記法の置換 (`formatAozoraMarkup`)**: 各行に対して下記のマークアップ置換（正規表現）を順次適用します。
 
 #### マークアップ置換規則
 - **エスケープ処理 (XSS対策)**:
@@ -391,12 +393,15 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
      - モバイル時（画面幅767px以下）: `column-width: calc(100% - var(--reader-viewport-padding-x) * 2); column-gap: calc(var(--reader-viewport-padding-x) * 2);`
      - PC時（画面幅768px以上）: `column-width: calc(50% - var(--reader-viewport-padding-x) * 2); column-gap: calc(var(--reader-viewport-padding-x) * 2);`
   ```css
-  /* 改段・改ページ防止（見出しのみに適用） */
+  /* 改段・改ページ制御（見出しごとに改ページし開始させ、見出し要素の境界分割を防止） */
   .reader-content h1,
   .reader-content h2,
   .reader-content h3,
   .reader-content h4,
   .reader-content h5 {
+      break-before: column;
+      -webkit-column-break-before: always;
+      page-break-before: always;
       break-inside: avoid;
       -webkit-column-break-inside: avoid;
       page-break-inside: avoid;

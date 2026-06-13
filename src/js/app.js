@@ -626,6 +626,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 continue;
             }
 
+            // Detect headings before formatting the markup
+            let isHeading = false;
+            let headingLevel = 2; // Default to h2 for large heading
+            const headingMatch = line.match(/［＃「([^」]+)」は(大|中|小)見出し］/);
+            if (headingMatch) {
+                isHeading = true;
+                const levelChar = headingMatch[2];
+                if (levelChar === '大') headingLevel = 2;
+                else if (levelChar === '中') headingLevel = 3;
+                else if (levelChar === '小') headingLevel = 4;
+                
+                // Remove the heading annotation so it doesn't get processed as regular text
+                line = line.replace(/［＃「[^」]+」は(?:大|中|小)見出し］/, '');
+            }
+
             // Convert Aozora rubies and formatting
             line = formatAozoraMarkup(line);
 
@@ -634,8 +649,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Keep empty lines as spacing paragraph or combine
                 parsedLines.push('<p class="empty-line">&nbsp;</p>');
             } else {
-                // Handle headings
-                if (line.startsWith('<h2>') || line.startsWith('<h3>')) {
+                if (isHeading) {
+                    parsedLines.push(`<h${headingLevel}>${line}</h${headingLevel}>`);
+                } else if (line.startsWith('<h2>') || line.startsWith('<h3>')) {
                     parsedLines.push(line);
                 } else {
                     parsedLines.push(`<p>${line}</p>`);
