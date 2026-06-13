@@ -94,17 +94,17 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
 ### 2.3 事前定義作品のマスターデータとロード仕様
 
 * **マスターデータ構造**:
-  事前定義作品（吉川英治「宮本武蔵」8作品）のメタデータを `app.js` 内にオブジェクト配列として定義します。
+  事前定義作品（吉川英治「宮本武蔵」8作品、夏目漱石「こころ」、魯迅「故郷」）のメタデータを `app.js` 内にオブジェクト配列として定義します。
   ```javascript
   const PREDEFINED_BOOKS = [
-    { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt" },
-    { id: "musashi_02", title: "宮本武蔵 02 地の巻", cardId: 52396, path: "src/books/52396_yoko.txt" },
-    { id: "musashi_03", title: "宮本武蔵 03 水の巻", cardId: 52397, path: "src/books/52397_yoko.txt" },
-    { id: "musashi_04", title: "宮本武蔵 04 火の巻", cardId: 52398, path: "src/books/52398_yoko.txt" },
-    { id: "musashi_05", title: "宮本武蔵 05 風の巻", cardId: 52399, path: "src/books/52399_yoko.txt" },
-    { id: "musashi_06", title: "宮本武蔵 06 空の巻", cardId: 52400, path: "src/books/52400_yoko.txt" },
-    { id: "musashi_07", title: "宮本武蔵 07 二天の巻", cardId: 52401, path: "src/books/52401_yoko.txt" },
-    { id: "musashi_08", title: "宮本武蔵 08 円明の巻", cardId: 52402, path: "src/books/52402_yoko.txt" }
+    // 開発者のオススメ本
+    { id: "kokoro", title: "こころ", shortTitle: "こころ", cardId: 773, path: "src/books/773_yoko.txt", category: "developer", author: "夏目漱石", meta: "夏目漱石" },
+    { id: "gokyo", title: "故郷", shortTitle: "故郷", cardId: 42939, path: "src/books/42939_yoko.txt", category: "developer", author: "魯迅", meta: "魯迅" },
+
+    // 読書家のオススメ本
+    { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", shortTitle: "序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt", category: "reader", author: "吉川英治", meta: "01" },
+    { id: "musashi_02", title: "宮本武蔵 02 地の巻", shortTitle: "地の巻", cardId: 52396, path: "src/books/52396_yoko.txt", category: "reader", author: "吉川英治", meta: "02" },
+    ...
   ];
   ```
 * **データの取得アルゴリズム (`loadPredefinedBook(book)`)**:

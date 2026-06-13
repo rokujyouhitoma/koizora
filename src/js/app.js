@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const readingIndex = document.getElementById('reading-index');
     
     // Predefined Books Grid
-    const predefinedBooksGrid = document.getElementById('predefined-books-grid');
+    const developerBooksGrid = document.getElementById('developer-books-grid');
+    const readerBooksGrid = document.getElementById('reader-books-grid');
 
     // Debug Modal Elements
     const btnOpenDebug = document.getElementById('btn-open-debug');
@@ -47,14 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClearAll = document.getElementById('btn-clear-all');
 
     const PREDEFINED_BOOKS = [
-        { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", shortTitle: "序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt" },
-        { id: "musashi_02", title: "宮本武蔵 02 地の巻", shortTitle: "地の巻", cardId: 52396, path: "src/books/52396_yoko.txt" },
-        { id: "musashi_03", title: "宮本武蔵 03 水の巻", shortTitle: "水の巻", cardId: 52397, path: "src/books/52397_yoko.txt" },
-        { id: "musashi_04", title: "宮本武蔵 04 火の巻", shortTitle: "火の巻", cardId: 52398, path: "src/books/52398_yoko.txt" },
-        { id: "musashi_05", title: "宮本武蔵 05 風の巻", shortTitle: "風の巻", cardId: 52399, path: "src/books/52399_yoko.txt" },
-        { id: "musashi_06", title: "宮本武蔵 06 空の巻", shortTitle: "空の巻", cardId: 52400, path: "src/books/52400_yoko.txt" },
-        { id: "musashi_07", title: "宮本武蔵 07 二天の巻", shortTitle: "二天の巻", cardId: 52401, path: "src/books/52401_yoko.txt" },
-        { id: "musashi_08", title: "宮本武蔵 08 円明の巻", shortTitle: "円明の巻", cardId: 52402, path: "src/books/52402_yoko.txt" }
+        // 開発者のオススメ本
+        { id: "kokoro", title: "こころ", shortTitle: "こころ", cardId: 773, path: "src/books/773_yoko.txt", category: "developer", author: "夏目漱石", meta: "夏目漱石" },
+        { id: "gokyo", title: "故郷", shortTitle: "故郷", cardId: 42939, path: "src/books/42939_yoko.txt", category: "developer", author: "魯迅", meta: "魯迅" },
+
+        // 読書家のオススメ本
+        { id: "musashi_01", title: "宮本武蔵 01 序、はしがき", shortTitle: "序、はしがき", cardId: 52395, path: "src/books/52395_yoko.txt", category: "reader", author: "吉川英治", meta: "01" },
+        { id: "musashi_02", title: "宮本武蔵 02 地の巻", shortTitle: "地の巻", cardId: 52396, path: "src/books/52396_yoko.txt", category: "reader", author: "吉川英治", meta: "02" },
+        { id: "musashi_03", title: "宮本武蔵 03 水の巻", shortTitle: "水の巻", cardId: 52397, path: "src/books/52397_yoko.txt", category: "reader", author: "吉川英治", meta: "03" },
+        { id: "musashi_04", title: "宮本武蔵 04 火の巻", shortTitle: "火の巻", cardId: 52398, path: "src/books/52398_yoko.txt", category: "reader", author: "吉川英治", meta: "04" },
+        { id: "musashi_05", title: "宮本武蔵 05 風の巻", shortTitle: "風の巻", cardId: 52399, path: "src/books/52399_yoko.txt", category: "reader", author: "吉川英治", meta: "05" },
+        { id: "musashi_06", title: "宮本武蔵 06 空の巻", shortTitle: "空の巻", cardId: 52400, path: "src/books/52400_yoko.txt", category: "reader", author: "吉川英治", meta: "06" },
+        { id: "musashi_07", title: "宮本武蔵 07 二天の巻", shortTitle: "二天の巻", cardId: 52401, path: "src/books/52401_yoko.txt", category: "reader", author: "吉川英治", meta: "07" },
+        { id: "musashi_08", title: "宮本武蔵 08 円明の巻", shortTitle: "円明の巻", cardId: 52402, path: "src/books/52402_yoko.txt", category: "reader", author: "吉川英治", meta: "08" }
     ];
 
     // ==========================================================================
@@ -431,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDrawerControls();
 
     // Render Predefined Books Grid
-    if (predefinedBooksGrid) {
+    if (developerBooksGrid || readerBooksGrid) {
         PREDEFINED_BOOKS.forEach(book => {
             const card = document.createElement('div');
             card.className = 'book-card';
@@ -440,12 +446,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="book-card-cover">
                     <div class="book-card-title">${book.shortTitle}</div>
                 </div>
-                <div class="book-card-meta">${book.title.split(' ')[1]}</div>
+                <div class="book-card-meta">${book.meta}</div>
             `;
             card.addEventListener('click', () => {
                 loadPredefinedBook(book);
             });
-            predefinedBooksGrid.appendChild(card);
+            
+            if (book.category === 'developer' && developerBooksGrid) {
+                developerBooksGrid.appendChild(card);
+            } else if (book.category === 'reader' && readerBooksGrid) {
+                readerBooksGrid.appendChild(card);
+            }
         });
     }
 

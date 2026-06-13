@@ -119,12 +119,12 @@ sequenceDiagram
 | ├ 接続詞 | `.drop-or` | `#drop-zone` | 「または」の文字列表示。 |
 | └ ファイル選択ボタン | `label.btn-primary` | `#drop-zone` | クリックでファイルブラウザを起動する装飾ボタン。 |
 | **ファイルインプット** | `#file-input` | `label` 内 | `<input type="file" accept=".txt,.html,.xhtml">`（CSSで実体は非表示）。 |
-| **事前定義作品セクション** | `.predefined-books-section`| `.welcome-card` | ローカルにファイルがないユーザー向けの名作選択領域。 |
-| ├ セクションタイトル | `.section-title` | `.predefined-books-section`| 「名作を読む（吉川英治「宮本武蔵」）」の文字列表示。 |
-| └ 作品グリッド | `#predefined-books-grid` / `.predefined-books-grid` | `.predefined-books-section`| JavaScriptにより、定義済みの作品カードが動的に流し込まれるコンテナ。 |
-| **作品カード** | `.book-card` (動的生成) | `#predefined-books-grid` | 個々の作品を選択するためのボタン型カード要素。 |
+| **事前定義作品セクション** | `.predefined-books-section`| `.welcome-card` | ローカルにファイルがないユーザー向けのオススメ作品選択領域。 |
+| ├ セクションタイトル | `.section-title` | `.predefined-books-section`| 「開発者のオススメ本」または「読書家のオススメ本」の文字列表示。 |
+| └ 作品グリッド | `#developer-books-grid` / `#reader-books-grid` / `.predefined-books-grid` | `.predefined-books-section`| JavaScriptにより、それぞれのカテゴリ（開発者・読書家）の作品カードが動的に流し込まれるコンテナ。 |
+| **作品カード** | `.book-card` (動的生成) | 作品グリッド内 | 個々の作品を選択するためのボタン型カード要素。 |
 | ├ カバー | `.book-card-cover` | `.book-card` | 本の表紙を模した、和風の縦書きタイトル表示領域。 |
-| └ メタ情報 | `.book-card-meta` | `.book-card` | 作品情報等を横書きで表示する領域。 |
+| └ メタ情報 | `.book-card-meta` | `.book-card` | 作品の巻数や著者名等のメタ情報を横書きで表示する領域。 |
 | **ヘルプセクション** | `.help-section` | `.welcome-card` | 青空文庫からのダウンロード手順・利用方法を説明する領域。 |
 
 #### 2. 読書画面 (Reader Screen)
