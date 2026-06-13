@@ -546,6 +546,9 @@ a:hover {
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 0; /* Clear default block margin */
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
 }
 
 /* Aozora specific headings and styles */
@@ -559,6 +562,9 @@ a:hover {
     margin-right: 0.5em;
     line-height: 1.2;
     display: block;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
 }
 .reader-content h1 { font-size: 1.8em; }
 .reader-content h2 { font-size: 1.5em; }

@@ -377,6 +377,23 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   }
   ```
 
+### 5.8 ページ境界での文章の左右見切れ・ページ分割防止対策
+
+* **原因**: 縦書きマルチカラムレイアウトにおいて、段落（`<p>`）や見出し（`h1`〜`h5`）の要素がカラム（ページ）の境界にまたがって分割される際、ブラウザのフォントレンダリングやパディング計算の差異によって、境界付近の文字の左右（または上下）が見切れる（欠ける）現象が発生します。また、短い段落や見出しがページをまたいで不自然に分割されるのは、可読性を損ねる原因となります。
+* **対策**: 読書画面内の各テキストブロック（`<p>`）および見出し（`<h1>`〜`<h5>`）に対し、改段・改ページを防止する CSS プロパティ `break-inside: avoid` およびその互換用プロパティを適用します。これにより、要素全体がページ内に収まらない場合は、自動的に丸ごと次のページ（次のカラム）へ送られるようになります。
+  ```css
+  .reader-content p,
+  .reader-content h1,
+  .reader-content h2,
+  .reader-content h3,
+  .reader-content h4,
+  .reader-content h5 {
+      break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      page-break-inside: avoid;
+  }
+  ```
+
 ---
 
 ## 6. デバッグ機能設計仕様 (Debug Specifications)
