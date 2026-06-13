@@ -459,11 +459,14 @@ a:hover {
 /* Viewport for reading text */
 .reader-viewport {
     position: absolute;
-    inset: 0;
+    top: 0;
+    bottom: 0;
+    left: var(--reader-padding-x);
+    right: var(--reader-padding-x);
     z-index: 1;
     overflow-x: hidden;
     overflow-y: hidden;
-    padding: 0; /* padding is moved to .reader-content to prevent scroll end cutoff */
+    padding: 0;
     /* CSS Scroll Snap for page alignment */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -499,8 +502,8 @@ a:hover {
     height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
     margin-top: var(--reader-padding-top);
     margin-bottom: var(--reader-padding-bottom);
-    padding-left: var(--reader-padding-x);
-    padding-right: var(--reader-padding-x);
+    padding-left: 0;
+    padding-right: 0;
     
     text-align: justify;
     line-break: strict;
@@ -516,7 +519,6 @@ a:hover {
     height: 100%;
     width: max-content;
     column-fill: auto;
-    column-gap: calc(var(--reader-padding-x) * 2); /* Perfect page break alignment */
 }
 
 /* Ensure vertical text always flows top-to-bottom and is top-aligned */
@@ -524,18 +526,11 @@ a:hover {
     direction: ltr;
 }
 
-/* Margin between consecutive sections to align page breaks exactly with 100vw viewport scroll steps */
-.direction-rtl .reader-section + .reader-section {
-    margin-right: calc(var(--reader-padding-x) * 2);
-}
-.direction-ltr .reader-section + .reader-section {
-    margin-left: calc(var(--reader-padding-x) * 2);
-}
-
 /* Set page column width to match viewport height-based ratio */
 @media (min-width: 768px) {
     .reader-section {
-        column-width: calc(50vw - var(--reader-padding-x) * 2); /* Fit exactly 2 columns per page view */
+        column-width: calc(50% - 40px); /* Two columns fit exactly with an 80px gap */
+        column-gap: 80px;
     }
 }
 @media (max-width: 767px) {
@@ -545,7 +540,8 @@ a:hover {
         --reader-padding-x: 24px; /* Slightly wider mobile margins for premium readability */
     }
     .reader-section {
-        column-width: calc(100vw - var(--reader-padding-x) * 2); /* Strictly force single column */
+        column-width: 100%; /* Force single column matching the viewport exactly */
+        column-gap: 0;
     }
 }
 

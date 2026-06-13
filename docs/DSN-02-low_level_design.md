@@ -292,32 +292,36 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 ### 5.4 モバイルレイアウト制限および垂直方向の上寄せ配置
 
 #### モバイル制限 (画面幅767px以下)
-* **Viewportパディングの削減**: 
-  左右のパディング幅を狭めつつ可読性を確保するため、`--reader-padding-x` を 24px に設定します。
+* **Viewportマージンによる余白の静的確保**: 
+  左右のパディング幅を狭めつつ十分な静的余白を確保するため、`--reader-padding-x` を 24px に設定します。
 * **単一カラム幅制限**:
-  画面の横幅から左右のパディング値（計48px）を差し引いた値を `column-width` に指定し、複数カラムが左右に並んで表示されるのを防ぎます。
+  スクロールコンテナである `.reader-viewport` が画面端から `var(--reader-padding-x)` 引き込んで配置されるため、ビューポート内の幅をそのまま占有するよう `column-width` を 100% に指定し、複数カラムが左右に並んで表示されるのを完全に防ぎます。
   ```css
   .reader-section {
-      column-width: calc(100vw - var(--reader-padding-x) * 2);
-      column-gap: calc(var(--reader-padding-x) * 2);
+      column-width: 100%;
+      column-gap: 0;
   }
   ```
 
 #### 垂直方向の上寄せ配置 (上寄せアライメント)
 * **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。また、親要素に `padding` を設定して `height: 100%` を子要素に与えると、ブラウザがスクロールバーやパディングを誤って計算し、テキスト下部が画面外（ビューポート外）に押し出されて描画される問題が生じます。
-* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウト（`position: absolute; inset: 0`）に変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`, `--reader-padding-x`）として定義します。スクロール末尾におけるブラウザのパディング消失バグを防ぐため、コンテナのパディングは `0` とし、子要素である `.reader-content` 自体に左右パディングを適用します。
+* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウトに変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの上下余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。左右の余白をスクロール動作中も含めて完全に静的でかつ均等な幅に保つため、コンテナ自体の `left` および `right` に対し `var(--reader-padding-x)` を適用して画面の左右から内側に引き込み、コンテナ内部のパディングおよびマージンは `0` にリセットします。
   ```css
   .reader-viewport {
       position: absolute;
-      inset: 0;
-      padding: 0; /* スクロールコンテナのパディングを0化 */
+      top: 0;
+      bottom: 0;
+      left: var(--reader-padding-x);
+      right: var(--reader-padding-x);
+      z-index: 1;
+      padding: 0;
   }
   .reader-content {
       height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
       margin-top: var(--reader-padding-top);
       margin-bottom: var(--reader-padding-bottom);
-      padding-left: var(--reader-padding-x);
-      padding-right: var(--reader-padding-x);
+      padding-left: 0;
+      padding-right: 0;
   }
   ```
 
@@ -378,10 +382,11 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 * **原因**: 
   1. 縦書きマルチカラムレイアウトにおいて、見出し（`h1`〜`h5`）の要素がカラム（ページ）の境界にまたがって分割される際、ブラウザのフォントレンダリングやパディング計算の差異によって、境界付近の文字の左右（または上下）が見切れる（欠ける）現象が発生します。なお、通常の段落（`<p>`）に改段防止（`break-inside: avoid`）を適用すると、1ページに収まらない長文段落が完全に画面外へ押し出されたり見切れたりする別の深刻なレイアウト崩れを引き起こすため、改段防止は短い見出し要素に限定する必要があります。
-  2. 改ページコード（`［＃改ページ］`）によって分割された複数の `.reader-section` 要素が並列配置された際、コンテナ左右余白分（`var(--reader-padding-x)`）が累積され、2つ目以降のセクションがビューポート幅（`100vw`）のグリッドから横方向にずれて表示されていました。これにより、文章の左右が見切れていました。
+  2. スクロールコンテナである `.reader-viewport` を画面幅いっぱいに広げてパディングを適用すると、改ページコード（`［＃改ページ］`）によって分割された複数の `.reader-section` が並列配置された際、余白によるレイアウトずれが累積し、改ページ以降で文字の左右が見切れていました。
 * **対策**: 
   1. 読書画面内の見出し（`<h1>`〜`<h5>`）に対し、改段・改ページを防止する CSS プロパティ `break-inside: avoid` およびその互換用プロパティを適用します。通常の段落（`<p>`）は、各ページ間で自然に分割されるようにします。
-  2. 改ページをまたぐ連続するセクション（`.reader-section + .reader-section`）に対し、レイアウト進行方向（RTL または LTR）のブロック開始端マージン（RTL時は `margin-right`、LTR時は `margin-left`）として `calc(var(--reader-padding-x) * 2)` を付与します。これにより、全セクションの開始位置がビューポートの1ページ境界（`100vw` の整数倍）と完全に同期され、スクロールによる見切れを完全に排除します。
+  2. スクロールコンテナである `.reader-viewport` 自体を `left` / `right` から `var(--reader-padding-x)` 分引き込んで配置し、左右余白を完全にコンテナの外側に静的固定します。各ページ（カラム）の合計幅はビューポート幅（`.reader-viewport` の実表示幅）の正確な整数倍となるよう同期させます。
+  3. モバイル時はビューポート幅にちょうど1つのカラムが収まるよう `column-width: 100%`、`column-gap: 0` とします。PC時は見開き2カラムが綺麗に収まるよう、`column-width: calc(50% - 40px)`、`column-gap: 80px` とします。これにより、別セクション（`.reader-section`）が並んでもマージン等の補正は不要になり、スクロール位置とページ境界が完璧に一致します。
   ```css
   /* 改段・改ページ防止（見出しのみに適用） */
   .reader-content h1,
@@ -394,12 +399,20 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
       page-break-inside: avoid;
   }
 
-  /* セクション間のレイアウトずれ補正（RTL / LTR別） */
-  .direction-rtl .reader-section + .reader-section {
-      margin-right: calc(var(--reader-padding-x) * 2);
+  /* モバイル時：1カラムをビューポート幅に同期 */
+  @media (max-width: 767px) {
+      .reader-section {
+          column-width: 100%;
+          column-gap: 0;
+      }
   }
-  .direction-ltr .reader-section + .reader-section {
-      margin-left: calc(var(--reader-padding-x) * 2);
+
+  /* PC時：見開き2カラム（column-width + column-gap）をビューポート幅に同期 */
+  @media (min-width: 768px) {
+      .reader-section {
+          column-width: calc(50% - 40px);
+          column-gap: 80px;
+      }
   }
   ```
 
