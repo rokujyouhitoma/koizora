@@ -467,7 +467,7 @@ a:hover {
     z-index: 1;
     overflow-x: hidden;
     overflow-y: hidden;
-    padding: 0 var(--reader-viewport-padding-x);
+    padding: 0;
     /* CSS Scroll Snap for page alignment */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -521,6 +521,7 @@ a:hover {
     width: max-content;
     column-fill: auto;
     column-gap: calc(var(--reader-viewport-padding-x) * 2);
+    padding: 0 var(--reader-viewport-padding-x);
 }
 
 /* Ensure vertical text always flows top-to-bottom and is top-aligned */
@@ -534,7 +535,7 @@ a:hover {
         --reader-viewport-padding-x: 20px;
     }
     .reader-section {
-        column-width: calc(50% - var(--reader-viewport-padding-x));
+        column-width: calc(50% - var(--reader-viewport-padding-x) * 2);
         column-gap: calc(var(--reader-viewport-padding-x) * 2);
     }
 }
@@ -545,7 +546,7 @@ a:hover {
         --reader-padding-x: 24px; /* Slightly wider mobile margins for premium readability */
     }
     .reader-section {
-        column-width: 100%; /* Force single column matching the viewport exactly */
+        column-width: calc(100% - var(--reader-viewport-padding-x) * 2);
         column-gap: calc(var(--reader-viewport-padding-x) * 2);
     }
 }

@@ -294,18 +294,19 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 #### モバイル制限 (画面幅767px以下)
 * **Viewportマージンによる余白の静的確保**: 
   左右のパディング幅を狭めつつ十分な静的余白を確保するため、`--reader-padding-x` を 24px に設定します。
-* **単一カラム幅制限と安全パディング**:
-  スクロールコンテナである `.reader-viewport` が画面端から `var(--reader-padding-x)` 引き込んで配置され、さらに左右の内側に安全余白 `--reader-viewport-padding-x: 16px` を設定します。ビューポート内の幅をそのまま占有するよう `column-width` を 100% に指定し、複数カラムが左右に並んで表示されるのを完全に防ぎます。また、カラム間隙間（`column-gap`）には内部パディングの2倍を設定し、横スクロールによるページ送り幅と物理幅を完全に同期させます。
+* **単一カラム幅制限と安全パディング（スクロールパディング消失バグへの代替策）**:
+  スクロールコンテナである `.reader-viewport` が画面端から `var(--reader-padding-x)` 引き込んで配置されます。さらに文字の見切れを防ぐ安全余白として `--reader-viewport-padding-x: 16px` を設定します。ただし、コンテナ自体に `padding` を設定すると、ブラウザ（特に Chrome/Safari）がスクロール終端（左端）でパディングを無視してスクロール領域を打ち切るため、最後のページの文字が画面左端フレームに密着して見切れてしまいます。これを防ぐ**代替策（ワークアラウンド）**として、`.reader-viewport` 自体は `padding: 0` とし、代わりに子要素であるコンテンツブロック `.reader-section` 自身に `padding: 0 var(--reader-viewport-padding-x);` を適用します。ビューポート内の幅をそのまま占有するよう カラム幅は `column-width: calc(100% - var(--reader-viewport-padding-x) * 2)` に指定し、複数カラムが左右に並んで表示されるのを完全に防ぎます。また、カラム間隙間（`column-gap`）には内部パディングの2倍を設定し、横スクロールによるページ送り幅と物理幅を完全に同期させます。
   ```css
   .reader-section {
-      column-width: 100%;
+      padding: 0 var(--reader-viewport-padding-x);
+      column-width: calc(100% - var(--reader-viewport-padding-x) * 2);
       column-gap: calc(var(--reader-viewport-padding-x) * 2);
   }
   ```
 
 #### 垂直方向の上寄せ配置 (上寄せアライメント)
 * **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。また、親要素に `padding` を設定して `height: 100%` を子要素に与えると、ブラウザがスクロールバーやパディングを誤って計算し、テキスト下部が画面外（ビューポート外）に押し出されて描画される問題が生じます。
-* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウトに変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの上下余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。左右の余白をスクロール動作中も含めて完全に静的でかつ均等な幅に保つため、コンテナ自体の `left` および `right` に対し `var(--reader-padding-x)` を適用して画面の左右から内側に引き込み、コンテナ内部には左右の安全余白 `var(--reader-viewport-padding-x)` のパディングを設定します。
+* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウトに変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの上下余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。左右の余白をスクロール動作中も含めて完全に静的でかつ均等な幅に保つため、コンテナ自体の `left` および `right` に対し `var(--reader-padding-x)` を適用して画面の左右から内側に引き込みます。前述の通り、ブラウザのスクロール限界におけるパディング消失を回避する**代替策（ワークアラウンド）**として、コンテナ内部のパディングは `0` にリセットし、パディングは子要素の `.reader-section` 自体に持たせます。
   ```css
   .reader-viewport {
       position: absolute;
@@ -314,7 +315,7 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
       left: var(--reader-padding-x);
       right: var(--reader-padding-x);
       z-index: 1;
-      padding: 0 var(--reader-viewport-padding-x);
+      padding: 0; /* 代替策としてコンテナのパディングは0とし、.reader-section側で持たせる */
   }
   .reader-content {
       height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
@@ -385,10 +386,10 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   2. スクロールコンテナである `.reader-viewport` とその中のテキストカラムの配置において、安全なパディングが設定されていないと、最後のページ（左端のカラム）のテキストの左端（縦書きにおけるへん側など）がコンテナの物理的境界でクリップされ、文字の左半分が見切れてしまいます。
 * **対策**: 
   1. 読書画面内の見出し（`<h1>`〜`<h5>`）に対し、改段・改ページを防止する CSS プロパティ `break-inside: avoid` およびその互換用プロパティを適用します。通常の段落（`<p>`）は、各ページ間で自然に分割されるようにします。
-  2. スクロールコンテナである `.reader-viewport` に対し、左右の内側に安全余白（`--reader-viewport-padding-x`、モバイル: 16px、PC: 20px）を設定し、文字がコンテナ境界に密着するのを防ぎます。
-  3. 横スクロール量と各ページ（カラム）の合計幅をビューポートの物理幅（`clientWidth`）と完全に同期させ、ページ送りの位置ズレを完全に排除するため、カラム幅（`column-width`）とカラム隙間（`column-gap`）を以下のように数式に基づいて設定します。
-     - モバイル時（画面幅767px以下）: `column-width: 100%; column-gap: calc(var(--reader-viewport-padding-x) * 2)`
-     - PC時（画面幅768px以上）: `column-width: calc(50% - var(--reader-viewport-padding-x)); column-gap: calc(var(--reader-viewport-padding-x) * 2)`
+  2. スクロールコンテナである `.reader-viewport` に対し、ブラウザ（Chrome/Safari等）がスクロール限界でパディングを切り捨てるバグへの**代替策（ワークアラウンド）**として、コンテナのパディングを `0` にし、代わりに子要素であるコンテンツブロック（`.reader-section`）自体の左右に安全余白（`--reader-viewport-padding-x`、モバイル: 16px、PC: 20px）のパディングを設定し、文字が物理的境界に密着して見切れるのを完全に防ぎます。
+  3. 横スクロールのページ送り幅をビューポート物理幅（`clientWidth`）と完全に同期させ、ページ送りの位置ズレを完全に排除するため、セクション内パディングを含めた全体の合計幅が正確に $N \cdot V$ になるよう、カラム幅（`column-width`）とカラム隙間（`column-gap`）を以下の数式に基づいて設定します。
+     - モバイル時（画面幅767px以下）: `column-width: calc(100% - var(--reader-viewport-padding-x) * 2); column-gap: calc(var(--reader-viewport-padding-x) * 2);`
+     - PC時（画面幅768px以上）: `column-width: calc(50% - var(--reader-viewport-padding-x) * 2); column-gap: calc(var(--reader-viewport-padding-x) * 2);`
   ```css
   /* 改段・改ページ防止（見出しのみに適用） */
   .reader-content h1,
@@ -404,7 +405,8 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   /* モバイル時：1カラムをビューポート幅に同期 */
   @media (max-width: 767px) {
       .reader-section {
-          column-width: 100%;
+          padding: 0 var(--reader-viewport-padding-x);
+          column-width: calc(100% - var(--reader-viewport-padding-x) * 2);
           column-gap: calc(var(--reader-viewport-padding-x) * 2);
       }
   }
@@ -412,7 +414,8 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
   /* PC時：見開き2カラム（column-width + column-gap）をビューポート幅に同期 */
   @media (min-width: 768px) {
       .reader-section {
-          column-width: calc(50% - var(--reader-viewport-padding-x));
+          padding: 0 var(--reader-viewport-padding-x);
+          column-width: calc(50% - var(--reader-viewport-padding-x) * 2);
           column-gap: calc(var(--reader-viewport-padding-x) * 2);
       }
   }
