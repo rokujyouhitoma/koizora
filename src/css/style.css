@@ -10,6 +10,7 @@
     --reader-padding-top: 104px; /* 64px header + 40px padding */
     --reader-padding-bottom: 80px; /* 40px footer + 40px padding */
     --reader-padding-x: 60px;
+    --reader-viewport-padding-x: 16px;
     
     /* Theme Defaults (Sepia / 和紙) */
     --bg-app: #f5eedc;
@@ -466,7 +467,7 @@ a:hover {
     z-index: 1;
     overflow-x: hidden;
     overflow-y: hidden;
-    padding: 0;
+    padding: 0 var(--reader-viewport-padding-x);
     /* CSS Scroll Snap for page alignment */
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -519,6 +520,7 @@ a:hover {
     height: 100%;
     width: max-content;
     column-fill: auto;
+    column-gap: calc(var(--reader-viewport-padding-x) * 2);
 }
 
 /* Ensure vertical text always flows top-to-bottom and is top-aligned */
@@ -528,9 +530,12 @@ a:hover {
 
 /* Set page column width to match viewport height-based ratio */
 @media (min-width: 768px) {
+    :root {
+        --reader-viewport-padding-x: 20px;
+    }
     .reader-section {
-        column-width: calc(50% - 40px); /* Two columns fit exactly with an 80px gap */
-        column-gap: 80px;
+        column-width: calc(50% - var(--reader-viewport-padding-x));
+        column-gap: calc(var(--reader-viewport-padding-x) * 2);
     }
 }
 @media (max-width: 767px) {
@@ -541,7 +546,7 @@ a:hover {
     }
     .reader-section {
         column-width: 100%; /* Force single column matching the viewport exactly */
-        column-gap: 0;
+        column-gap: calc(var(--reader-viewport-padding-x) * 2);
     }
 }
 
