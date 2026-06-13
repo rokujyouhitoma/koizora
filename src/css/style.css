@@ -469,22 +469,15 @@ a:hover {
     -webkit-writing-mode: vertical-lr;
 }
 
-/* Book Content Container */
 .reader-content {
     text-orientation: mixed;
     -webkit-text-orientation: mixed;
-    direction: ltr; /* Ensure vertical text always flows top-to-bottom and is top-aligned */
-    width: max-content; /* Size container to fit all columns exactly, preventing trailing blank pages */
+    /* direction is inherited dynamically to control column progression direction */
+    width: max-content; /* Size container to fit all sections exactly */
     
     height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
     margin-top: var(--reader-padding-top);
     margin-bottom: var(--reader-padding-bottom);
-    /* Create multi-column layout for horizontal paging */
-    column-fill: auto;
-    column-gap: 80px; /* Space between pages */
-    
-    /* Apply scroll snap to columns */
-    scroll-snap-align: start;
     
     text-align: justify;
     line-break: strict;
@@ -494,9 +487,23 @@ a:hover {
     transition: font-size 0.3s ease, line-height 0.3s ease, letter-spacing 0.3s ease;
 }
 
+/* Reader Section (individual section multi-column container) */
+.reader-section {
+    display: block;
+    height: 100%;
+    width: max-content;
+    column-fill: auto;
+    column-gap: 80px; /* Space between pages */
+}
+
+/* Ensure vertical text always flows top-to-bottom and is top-aligned */
+.reader-section > * {
+    direction: ltr;
+}
+
 /* Set page column width to match viewport height-based ratio */
 @media (min-width: 768px) {
-    .reader-content {
+    .reader-section {
         column-width: 50vw; /* Column width takes half of the screen width */
     }
 }
@@ -506,8 +513,8 @@ a:hover {
         --reader-padding-bottom: 64px; /* 40px footer + 24px padding */
         --reader-padding-x: 20px;
     }
-    .reader-content {
-        column-width: calc(100vw - var(--reader-padding-x) * 2); /* Strictly force single column (100vw minus left/right padding) */
+    .reader-section {
+        column-width: calc(100vw - var(--reader-padding-x) * 2); /* Strictly force single column */
         column-gap: calc(var(--reader-padding-x) * 2);
     }
 }
@@ -560,6 +567,7 @@ a:hover {
 .reader-content .jisage {
     margin-top: 2em; /* shifts down (left margin in vertical is top margin equivalent for indentation) */
 }
+
 
 /* Typography styles */
 .font-mincho {

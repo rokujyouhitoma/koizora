@@ -496,6 +496,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             }
 
+            // Handle page breaks
+            if (line.includes('［＃改ページ］')) {
+                parsedLines.push('PAGE_BREAK');
+                continue;
+            }
+
             // Convert Aozora rubies and formatting
             line = formatAozoraMarkup(line);
 
@@ -522,8 +528,10 @@ document.addEventListener('DOMContentLoaded', () => {
             parsedLines.shift();
         }
 
-        // Wrap paragraphs
+        // Wrap sections and paragraphs
         let bodyContent = parsedLines.join('\n');
+        bodyContent = '<section class="reader-section">\n' + bodyContent + '\n</section>';
+        bodyContent = bodyContent.replace(/PAGE_BREAK/g, '</section>\n<section class="reader-section">');
 
         return {
             title: title + (author ? ` (${author})` : ''),
@@ -545,8 +553,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Match Chinese characters (Kanji, including iteration marks like 々)
         line = line.replace(/([一-龠々〆ヶ]+)《([^》]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
 
-        // 3. Page breaks: ［＃改ページ］
-        line = line.replace(/［＃改ページ］/g, '<div class="page-break" style="break-before: column; height: 100%;"></div>');
 
         // 4. Accent notes: ［＃「...」に傍点］
         // (Simplified placeholder handling: highlight text)
