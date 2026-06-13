@@ -428,11 +428,28 @@ a:hover {
     transform: translateY(-100%);
 }
 
+.reader-header .btn-icon {
+    flex-shrink: 0;
+}
+
+.right-controls {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .book-title {
     font-family: 'Noto Serif JP', serif;
     font-size: 18px;
     font-weight: 600;
     letter-spacing: 0.05em;
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 16px;
 }
 
 /* Viewport for reading text */
