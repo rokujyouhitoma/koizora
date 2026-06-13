@@ -498,13 +498,15 @@ a:hover {
     text-orientation: mixed;
     -webkit-text-orientation: mixed;
     /* direction is inherited dynamically to control column progression direction */
-    width: max-content; /* Size container to fit all sections exactly */
+    display: block;
+    width: max-content; /* Size container to fit all columns exactly */
+    column-fill: auto;
     
     height: calc(100% - var(--reader-padding-top) - var(--reader-padding-bottom));
     margin-top: var(--reader-padding-top);
     margin-bottom: var(--reader-padding-bottom);
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0 var(--reader-viewport-padding-x);
+    column-gap: calc(var(--reader-viewport-padding-x) * 2);
     
     text-align: justify;
     line-break: strict;
@@ -514,19 +516,18 @@ a:hover {
     transition: font-size 0.3s ease, line-height 0.3s ease, letter-spacing 0.3s ease;
 }
 
-/* Reader Section (individual section multi-column container) */
-.reader-section {
-    display: block;
-    height: 100%;
-    width: max-content;
-    column-fill: auto;
-    column-gap: calc(var(--reader-viewport-padding-x) * 2);
-    padding: 0 var(--reader-viewport-padding-x);
+/* Ensure vertical text always flows top-to-bottom and is top-aligned */
+.reader-content > * {
+    direction: ltr;
 }
 
-/* Ensure vertical text always flows top-to-bottom and is top-aligned */
-.reader-section > * {
-    direction: ltr;
+/* Page Break element inside columns */
+.page-break {
+    break-before: column;
+    -webkit-column-break-before: always;
+    page-break-before: always;
+    height: 0;
+    width: 0;
 }
 
 /* Set page column width to match viewport height-based ratio */
@@ -534,9 +535,8 @@ a:hover {
     :root {
         --reader-viewport-padding-x: 20px;
     }
-    .reader-section {
+    .reader-content {
         column-width: calc(50% - var(--reader-viewport-padding-x) * 2);
-        column-gap: calc(var(--reader-viewport-padding-x) * 2);
     }
 }
 @media (max-width: 767px) {
@@ -545,9 +545,8 @@ a:hover {
         --reader-padding-bottom: 64px; /* 40px footer + 24px padding */
         --reader-padding-x: 24px; /* Slightly wider mobile margins for premium readability */
     }
-    .reader-section {
+    .reader-content {
         column-width: calc(100% - var(--reader-viewport-padding-x) * 2);
-        column-gap: calc(var(--reader-viewport-padding-x) * 2);
     }
 }
 

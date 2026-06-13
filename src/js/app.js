@@ -654,8 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Wrap sections and paragraphs
         let bodyContent = parsedLines.join('\n');
-        bodyContent = '<section class="reader-section">\n' + bodyContent + '\n</section>';
-        bodyContent = bodyContent.replace(/PAGE_BREAK/g, '</section>\n<section class="reader-section">');
+        bodyContent = bodyContent.replace(/PAGE_BREAK/g, '<div class="page-break"></div>');
 
         return {
             title: title + (author ? ` (${author})` : ''),
