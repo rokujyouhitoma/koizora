@@ -69,9 +69,9 @@ Shift_JIS または UTF-8 から文字列へとデコードされたプレーン
   - 正規表現: `/([一-龠々〆ヶ]+)《([^》]+)》/g`
   - 置換後: `<ruby>$1<rt>$2</rt></ruby>`
 - **改ページ注記**:
-  `［＃改ページ］` を検出した際、CSSのマルチカラムをブレイクして次の列から表示を開始させるためのダミー要素を挿入します。
-  - 正規表現: `/［＃改ページ］/g`
-  - 置換後: `<div class="page-break" style="break-before: column; height: 100%;"></div>`
+  `［＃改ページ］` を検出した際、パース処理の段階で文書を分割し、個別のセクション要素（`<section class="reader-section">`）として分割出力することで、段組みを物理的に次のページ（見開き）から開始させます。
+  - プレースホルダー: `'PAGE_BREAK'`
+  - 変換結果: `</section>\n<section class="reader-section">`
 - **傍点（強調マーク）注記**:
   `［＃「...」に傍点］` を検出した際、傍点表示クラスを適用します。
   - 正規表現: `/［＃「([^」]+)」に傍点］/g`
@@ -302,9 +302,9 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 * **単一カラム幅制限**:
   画面の横幅から左右のパディング値（計40px）を差し引いた値を `column-width` に指定し、複数カラムが左右に並んで表示されるのを防ぎます。
   ```css
-  .reader-content {
-      column-width: calc(100vw - 40px);
-      column-gap: 40px;
+  .reader-section {
+      column-width: calc(100vw - var(--reader-padding-x) * 2);
+      column-gap: calc(var(--reader-padding-x) * 2);
   }
   ```
 
@@ -326,10 +326,10 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 ### 5.5 縦書きテキストのインライン方向（上から下）の固定
 
-* **原因**: ページめくりのスクロール初期表示位置を制御するため、親要素 `.reader-viewport` の CSS `direction` プロパティを `rtl` または `ltr` に動的に切り替えています。しかし、子要素 `.reader-content` が `direction` を継承すると、RTL 読書方向時に `direction: rtl` が適用され、縦書き文字のインライン方向（テキストの流れる方向）が「下から上」に反転してしまいます。このため、縦位置が下揃え（物理的な下端）になり、句読点（「。」など）が行頭（物理的な上端）に誤って回り込むなどの禁則処理・アライメントバグが発生します。
-* **対策**: 子要素 `.reader-content` のスタイルに明示的に `direction: ltr;` を指定します。これにより、親要素から `direction: rtl` が継承されるのを防ぎ、縦書きテキストの流れる方向を常に「上から下」に維持し、文章を物理的な「上揃え」で正しく描画させます。
+* **原因**: ページめくりのスクロール初期表示位置を制御するため、親要素 `.reader-viewport` の CSS `direction` プロパティを `rtl` または `ltr` に動的に切り替えています。しかし、子要素 `.reader-content` および `.reader-section` が `direction` を継承しない（`direction: ltr` 等を固定する）場合、RTL 読書時に段組み（マルチカラム）の超過分が左側（スクロール可能領域）ではなく右側の画面外へ溢れてしまい、2ページ目以降が空白になるバグが発生します。一方、`direction` をそのまま継承させると、縦書き文字のインライン方向（テキストの流れる方向）が「下から上」に反転してしまい、アライメント崩れを誘発します。
+* **対策**: 子要素 `.reader-content` および `.reader-section` は親要素の `direction`（`rtl` または `ltr`）を継承させて、段組みの並びと溢れの方向をスクロール方向と一致させます。その上で、縦書きテキストの文字の流れる方向を常に「上から下」に維持するため、セクションの直下の子要素群に対して一括で `direction: ltr;` を指定し、文字を物理的な「上揃え」で正しく描画させます。
   ```css
-  .reader-content {
+  .reader-section > * {
       direction: ltr; /* 縦書きテキストの流れ方向を常に「上から下」に固定 */
   }
   ```
@@ -338,12 +338,13 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 * **原因**:
   1. ファイル終端に多数の空行（bibliographical情報以前や段落間のパディングなど）が存在する場合、パーサー（`parseAozoraText`）がそれらをすべて空段落（`<p class="empty-line">&nbsp;</p>`）に変換してしまいます。縦書きマルチカラムでは、これらが余分な空白行としてレンダリングされ、最後のページ以降に連続する空ページを生じさせます。
-  2. マルチカラム要素である `.reader-content` の幅が `width: auto` である場合、親スクロールコンテナとの関係から、ブラウザ（特に Chrome/Safari）がスクロール可能な最大幅（`scrollWidth`）を余剰に見積もってしまい、最後のページ以降にも無限に右または左方向にスクロールできてしまうレイアウト計算上のバグが発生します。
+  2. マルチカラム要素の幅が `width: auto` である場合、親スクロールコンテナとの関係から、ブラウザ（特に Chrome/Safari）がスクロール可能な最大幅（`scrollWidth`）を余剰に見積もってしまい、最後のページ以降にも無限にスクロールできてしまうレイアウト計算上のバグが発生します。また、縦書きマルチカラムと改ページ制御の組み合わせでは、`max-content` が最初の改ページ位置で計算を打ち切ってしまい、それ以降が非表示になる Chromium のバグがあります。
 * **対策**:
   1. `app.js` のテキストパーサー内において、パース完了後の配列 `parsedLines` の先頭および末尾から空段落を `shift()`/`pop()` により自動的に切り詰めます（トリミング処理）。
-  2. `.reader-content` のスタイルに **`width: max-content;`** を適用します。これにより、マルチカラムコンテナの幅は生成された全カラム（ページ数）の合計幅（`N * column-width + (N-1) * column-gap`）に厳密に一致するように強制され、ブラウザによる余分なスクロール領域の自動算出を防ぎます。
+  2. 改ページをセクション分割によって解決した上で、`.reader-content` および `.reader-section` のスタイルに **`width: max-content;`** を適用します。これにより、マルチカラムおよびセクションコンテナの幅は生成された全カラム（ページ数）の合計幅に厳密に一致するように強制され、ブラウザによる余分なスクロール領域の自動算出を防ぎます。
   ```css
-  .reader-content {
+  .reader-content,
+  .reader-section {
       width: max-content; /* 全カラムの合計幅にサイズを固定し、空スクロールを完全に抑止 */
   }
   ```
