@@ -46,7 +46,7 @@
 | **[MNG-02] 開発プロセス定義書** | [MNG-02-development_process.md](/docs/MNG-02-development_process.md) | プロジェクトの開発ライフサイクル、各工程の作業定義、担当者、および成果物の追跡性を定義する。 | 開発チーム、人間（User）、AI Agent | 開発手法やプロセス方針を変更した時 |
 | **[MNG-03] 問題管理定義書** | [MNG-03-problem_management.md](/docs/MNG-03-problem_management.md) | システム上の不具合や脆弱性などの問題を検知・分析し、解決・恒久対策を行うための管理策を定義する。 | 開発チーム、人間（User）、AI Agent | 新しい管理基準や問題対応プロセスの追加・変更時 |
 | **[MNG-04] 変更管理定義書** | [MNG-04-change_management.md](/docs/MNG-04-change_management.md) | システムや要件の変更に伴うリスクを最小化し、承認および検証された変更を適用するための管理策を定義する。 | 開発チーム、人間（User）、AI Agent | 変更手続きや検証・承認プロセスの見直し時 |
-| **[MNG-05] テスト仕様書** | [MNG-05-test_cases.md](/docs/MNG-05-test_cases.md) | 各工程（UR, SRD, HLD, LLD, Make）に対応した品質および機能性のためのテストケースを定義する。 | 開発チーム、人間（User）、AI Agent | 新機能の追加、仕様変更、および検証プロセスの見直し時 |
+| **[MNG-05] テスト仕様書** | [MNG-05-test_cases.md](/docs/MNG-05-test_cases.md) | 各検証レベル（受入検証、システム検証、結合検証、単体検証、および実装セルフチェック）に対応した品質および機能性のためのテストケースを定義する。 | 開発チーム、人間（User）、AI Agent | 新機能の追加、仕様変更、および検証プロセスの見直し時 |
 | **[REQ-01] 要求定義書** | [REQ-01-user_requirements.md](/docs/REQ-01-user_requirements.md) | ユーザーの目的、必須対応作品、ユースケースなどのビジネス上の「要求（URD）」を定義する。 | 人間（User）、AI Agent | ユーザー要求の変更、動作保証作品の追加・変更時 |
 | **[REQ-02] 機能一覧** | [REQ-02-feature_list.md](/docs/REQ-02-feature_list.md) | 実装済みおよび今後実装予定の全機能を一覧化し、各機能の仕様概要、ステータス、追跡性を管理する。 | 開発チーム、人間（User）、AI Agent | 機能の追加・削除・実装ステータスの変更時 |
 | **[REQ-03] 要件定義書** | [REQ-03-system_requirements.md](/docs/REQ-03-system_requirements.md) | システム概要、対応フォーマット、および機能・非機能的な「要件（SRD）」を定義する。 | 開発チーム、AI Agent | システムに対する機能・非機能要件の追加・変更時 |

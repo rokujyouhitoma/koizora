@@ -55,7 +55,7 @@
 
 * **目的**:
   * 設計時のトレードオフや前提条件を明文化し、意思決定のブラックボックス化を防ぐ。
-  * 将来のリファクタリングや仕様変更時に、当時の設計意図（コンテキスト）を参照できるようにする.
+  * 将来のリファクタリングや仕様変更時に、当時の設計意図（コンテキスト）を参照できるようにする。
 * **ADRの構成テンプレート**:
   * **タイトル / ID**: 例 `ADR-0001: Vanilla JS および純粋な HTML/CSS の採用`
   * **日付 (Date)**: 意思決定を行った日付
@@ -82,24 +82,42 @@
 
 ## 2. 開発プロセスの全体像 (Process Overview)
 
-開発プロセスは以下の6つの工程から構成され、反復的かつインクリメンタルに進行します。
+開発プロセスは、実装と検証を完全に独立させ、各要件・設計レベルに対応する検証レベルを定義した「V字モデル」に沿って、以下の9つの工程から構成されます。
 
 ```mermaid
 flowchart TD
-    Phase1["1. 要求定義<br>(User Requirements: URD)"]
-    Phase2["2. 要件定義<br>(System Requirements: SRD)"]
-    Phase3["3. 基本設計<br>(High-Level Design: HLD)"]
-    Phase4["4. 詳細設計<br>(Low-Level Design: LLD)"]
-    Phase5["5. 実装・単体検証<br>(Implementation & Unit Testing)"]
-    Phase6["6. システム検証・リリース<br>(Verification & Release)"]
-    
-    Phase1 -->|"要求の確定"| Phase2
-    Phase2 -->|"要件の確定"| Phase3
-    Phase3 -->|"設計方針の確定"| Phase4
-    Phase4 -->|"詳細設計の確定"| Phase5
-    Phase5 -->|"機能単体の完成"| Phase6
-    Phase6 -->|"動作検証NGのフィードバック"| Phase5
-    Phase6 -->|"要求変更・機能拡張"| Phase1
+    subgraph 設計・開発フェーズ (Left)
+        Phase1["1. 要求定義 (URD)"]
+        Phase2["2. 要件定義 (SRD)"]
+        Phase3["3. 基本設計 (HLD)"]
+        Phase4["4. 詳細設計 (LLD)"]
+        Phase5["5. 実装 (Make)"]
+    end
+
+    subgraph 検証・リリースフェーズ (Right)
+        Phase6["6. 単体検証 (Unit Verification)"]
+        Phase7["7. 結合検証 (Integration Verification)"]
+        Phase8["8. システム検証 (System Verification)"]
+        Phase9["9. 受入検証・リリース (Acceptance & Release)"]
+    end
+
+    %% 開発・実装の流れ
+    Phase1 --> Phase2
+    Phase2 --> Phase3
+    Phase3 --> Phase4
+    Phase4 --> Phase5
+    Phase5 --> Phase6
+
+    %% 検証・リリースの流れ
+    Phase6 --> Phase7
+    Phase7 --> Phase8
+    Phase8 --> Phase9
+
+    %% V字モデルの対応関係
+    Phase4 -.->|"対応・詳細設計検証"| Phase6
+    Phase3 -.->|"対応・論理設計検証"| Phase7
+    Phase2 -.->|"対応・システム要件検証"| Phase8
+    Phase1 -.->|"対応・ビジネス要求検証"| Phase9
 ```
 
 ---
@@ -116,9 +134,7 @@ flowchart TD
 * **インプット**: ユーザーからの機能要求、利用する外部公開リソース（青空文庫形式）の仕様。
 * **主要成果物**:
   * [REQ-01-user_requirements.md](/docs/REQ-01-user_requirements.md) （要求定義書）
-    * 背景・目的、ターゲットユーザー、動作保証対象とする必須作品（吉川英治「宮本武蔵」8作品等）、今後のロードマップの定義。
   * [REQ-02-feature_list.md](/docs/REQ-02-feature_list.md) （機能一覧）
-    * 実装済みおよび今後実装予定の全機能を一覧化し、そのステータス、仕様概要、および要求定義（URD）・要件定義（SRD）とのトレーサビリティを管理。
 
 ### 3.2 要件定義 (System Requirements Definition: SRD)
 * **概要**: 要求定義で整理されたユーザー要求を満たすために、システムが満たすべき具体的な機能要件（ファイル読み込み、デコード、パース仕様、ビューアー制御、しおり等）および非機能要件（UI/UXガイドライン、セキュリティ/XSS対策、パフォーマンス要件等）を定義します。
@@ -128,7 +144,6 @@ flowchart TD
 * **インプット**: [REQ-01-user_requirements.md](/docs/REQ-01-user_requirements.md), [REQ-02-feature_list.md](/docs/REQ-02-feature_list.md)
 * **主要成果物**:
   * [REQ-03-system_requirements.md](/docs/REQ-03-system_requirements.md) （要件定義書）
-    * システム構成、対応フォーマット、文字コード判定、詳細な機能要件（記法パース・ビューアー・表示カスタマイズ・しおり等）および非機能要件の定義。
 
 ### 3.3 基本設計 (High-Level Design: HLD)
 * **概要**: システム全体のアーキテクチャ（MVC等）、各レイヤー（View, Controller, Storage）の役割境界、コンポーネント間の論理データフロー、共通UI/UXデザイン原則、およびエスケープ処理などの共通セキュリティ方針を定義します。TOGAF EAのAA・DA・TAの論理レベル設計に相当します。
@@ -138,7 +153,6 @@ flowchart TD
 * **インプット**: [REQ-03-system_requirements.md](/docs/REQ-03-system_requirements.md)
 * **主要成果物**:
   * [DSN-01-high_level_design.md](/docs/DSN-01-high_level_design.md) （基本設計書）
-    * クライアントサイドSPA構成図、ファイル読込シーケンス、カラーテーマ（4種類）とCSS変数定義、Noto Serif JPフォントの使用方針、エスケープによるXSS保護策等の記述。
   * **docs/adr/*.md** （アーキテクチャ意思決定記録：重要設計事項が発生した際に適宜新規作成・更新）
 
 ### 3.4 詳細設計 (Low-Level Design: LLD)
@@ -149,42 +163,78 @@ flowchart TD
 * **インプット**: [DSN-01-high_level_design.md](/docs/DSN-01-high_level_design.md)
 * **主要成果物**:
   * [DSN-02-low_level_design.md](/docs/DSN-02-low_level_design.md) （詳細設計書）
-    * 状態変数（`currentBook`等）の定義、ルビや改ページの正規表現マッピング、カラム数やスクロール位置に基づくページ計算式、LocalStorageデータスキーマ、CSSスタイル割り当て値の記述。
   * **docs/adr/*.md** （詳細な技術的意思決定記録：必要に応じて作成・更新）
 
-### 3.5 実装および単体検証 (Implementation & Unit Testing)
-* **概要**: 詳細設計書で定義された物理ロジックを基に、HTML/CSS/JavaScriptコードを記述します。また、モックデータや検証用ファイル（Shift_JIS形式のテキスト等）を用いて、パーサーの変換精度やブラウザ上でのスタイル崩れの有無を単体レベルで検証・デバッグします。
+### 3.5 実装 (Implementation: Make)
+* **概要**: 詳細設計書で定義された物理ロジックに基づき、実際にHTML/CSS/JavaScriptコードを記述します。コードの構文チェックや、DOM構造などの基本マークアップが詳細設計に準拠していることをセルフチェックします。
 * **担当エージェント・担当者**:
-  * **主担当**: AI Agent（HTML/CSS/JSコーディング、デバッグ、単体単機能テスト）
-  * **確認・レビュー**: User (人間)（コードの最終レビュー、必要に応じたUI崩れのフィードバック）
+  * **主担当**: AI Agent（HTML/CSS/JSコーディング、コードのセルフチェック）
+  * **確認・レビュー**: User (人間)（コードの最終レビュー）
 * **インプット**: [DSN-02-low_level_design.md](/docs/DSN-02-low_level_design.md)
 * **主要成果物**:
   * [index.html](/index.html) （アプリ構造およびマークアップ）
   * [style.css](/src/css/style.css) （デザイン・テーマ・マルチカラム定義）
   * [app.js](/src/js/app.js) （デコード・パース・スクロールイベント等のロジック）
-  * **検証用青空文庫テストファイル** （手動またはスクリプトによるパース挙動確認用のテスト用 `.txt`/`.html` データ）
 
-### 3.6 システム検証およびリリース (System Verification & Release)
-* **概要**: アプリケーション全体が要件定義を満たしているかを検証します。PC・モバイルのレスポンシブ動作、しおりの保存・自動セッション復元、大容量ファイルのロード性能、エスケープの機能性などを網羅的にテストし、動作確認が完了したファイルを本番ホスティング環境（例: GitHub Pages）へデプロイします。
+### 3.6 単体検証 (Unit Verification)
+* **概要**: 詳細設計書（LLD）に対応する検証フェーズです。プログラムの内部状態管理、状態遷移、ページ計算アルゴリズムの絶対値変換、および正規表現による置換関数が、詳細設計で定義された通りの物理ロジック・アルゴリズムに準拠し、正しい結果を出力するかを検証します。
 * **担当エージェント・担当者**:
-  * **システムテスト実行**: AI Agent（検証・動作ログ分析、Walkthrough作成）
-  * **動作・UI最終検証**: User (人間)（実際のブラウザ上での操作検証、デプロイ実行、リリース承認）
-* **インプット**: Phase 5 で作成されたソースコード一式。
+  * **主担当**: AI Agent（単体テスト・検証の実行、単体バグ修正）
+  * **確認・レビュー**: User (人間)（検証結果の確認、コードのテストカバレッジレビュー）
+* **インプット**: [DSN-02-low_level_design.md](/docs/DSN-02-low_level_design.md), [index.html](/index.html), [style.css](/src/css/style.css), [app.js](/src/js/app.js), [MNG-05-test_cases.md](/docs/MNG-05-test_cases.md)（単体検証テストケース）
 * **主要成果物**:
-  * **静的プロダクション配信ファイル群** （`index.html`, `style.css`, `app.js`）
-  * [walkthrough.md](file:///root/.gemini/antigravity-ide/brain/e86b7771-850b-4ad2-a87d-6348ddf56ef8/walkthrough.md) （検証結果・変更点レポート）
-  * [README.md](/README.md) （導入・利用マニュアル）
+  * **単体検証結果レポート** （`walkthrough.md` に結果を記載）
+
+### 3.7 結合検証 (Integration Verification)
+* **概要**: 基本設計書（HLD）に対応する検証フェーズです。画面状態（State）の切り替えによるSPA画面遷移、ビューポートと安全パディングによるスクロール配置の制御、Webフォントの非同期ロード、およびテーマ切り替え時のCSSカスタムプロパティの一括適用など、コンポーネントやレイヤー間のデータ連携と表示アライメントが論理設計通り機能するかを検証します。
+* **担当エージェント・担当者**:
+  * **主担当**: AI Agent（結合テスト・レイアウト整合検証の実行）
+  * **確認・レビュー**: User (人間)（レイアウト崩れの有無確認、SPA遷移の同期挙動確認）
+* **インプット**: [DSN-01-high_level_design.md](/docs/DSN-01-high_level_design.md), [app.js](/src/js/app.js), [style.css](/src/css/style.css), [MNG-05-test_cases.md](/docs/MNG-05-test_cases.md)（結合検証テストケース）
+* **主要成果物**:
+  * **結合検証結果レポート** （`walkthrough.md` に結果を記載）
+
+### 3.8 システム検証 (System Verification)
+* **概要**: システム要件定義書（SRD）に対応する検証フェーズです。Shift_JISテキストのドラッグ＆ドロップ読み込み、青空文庫記法のパース精度、UIコントロールによる文字間・行間・サイズの動的適用とページ再計算、フッターシークバーの連動、エスケープによるXSS防御など、システム要件に定義された機能・非機能がすべて正しく動作するかをシステム全体で検証します。
+* **担当エージェント・担当者**:
+  * **主担当**: AI Agent（システムテスト実行、パフォーマンス・セキュリティ検証）
+  * **確認・レビュー**: User (人間)（要件適合性のレビュー）
+* **インプット**: [REQ-03-system_requirements.md](/docs/REQ-03-system_requirements.md), [app.js](/src/js/app.js), [style.css](/src/css/style.css), [MNG-05-test_cases.md](/docs/MNG-05-test_cases.md)（システム検証テストケース）
+* **主要成果物**:
+  * **システム検証結果レポート** （`walkthrough.md` に結果を記載）
+
+### 3.9 受入検証およびリリース (Acceptance Verification & Release)
+* **概要**: ユーザー要求（UR）に対応する検証フェーズです。実際のユーザー目線（動作保証対象とする青空文庫書籍の完全な閲覧性、モバイル・PCのレスポンシブな縦書き読書体験、しおりによる再開体験など）において、本質的な「小説の快適な読書」が可能であるかを検証します。動作確認の完了後、本番環境へのリリースを行います。
+* **担当エージェント・担当者**:
+  * **受入検証実行**: User (人間)（受入検証の実行、最終リリース承認）
+  * **支援**: AI Agent（動作ログ確認、デプロイ検証支援）
+* **インプット**: [REQ-01-user_requirements.md](/docs/REQ-01-user_requirements.md), [MNG-05-test_cases.md](/docs/MNG-05-test_cases.md)（受入検証テストケース）
+* **主要成果物**:
+  * **受入検証結果・リリースレポート** （`walkthrough.md`, `README.md`）
+  * **静的プロダクションリリースファイル群**
 
 ---
 
 ## 4. 成果物のトレーサビリティ (Deliverable Traceability)
 
-ゆうぞらプロジェクトの品質を保証するため、以下の成果物間のトレーサビリティ（追跡性）を維持します。
+ゆうぞらプロジェクトの品質を保証するため、以下の成果物および検証フェーズ間のトレーサビリティ（追跡性）を維持します。
 
-| ユーザー要求 (URD) | システム要件 (SRD) | 対応する基本設計 (HLD) | 対応する詳細設計 (LLD) | 対応する実装コード |
-| :--- | :--- | :--- | :--- | :--- |
-| **ファイル読み込み** | **3.1 ファイル読み込み要件** | 2.2 データフローシーケンス | 1. 状態変数<br>2.1 デコード処理 | `app.js`: `handleFile`, `FileReader` |
-| **青空文庫記法パース** | **3.2 パース機能要件** | 4. セキュリティ設計 | 2.1 パース正規表現、実体エスケープ | `app.js`: `parseAozoraText` |
-| **縦書き読書体験** | **3.3 ビューアー機能要件** | 3.1 縦書き・マルチカラム構成 | 3. ページ計算・送り計算 | `index.html`: `reader-content`<br>`app.js`: `nextPage`, `prevPage` |
-| **表示カスタマイズ** | **3.4 カスタマイズ要件** | 3.2 テーマ定義<br>3.3/3.4 スタイル構成 | 5. CSS変数<br>5.2 クラス定義 | `style.css`: テーマクラス<br>`app.js`: `syncButtonState` |
-| **しおり・状態保持** | **3.5 しおり機能要件** | 1.2 Storageの役割定義 | 4. LocalStorageスキーマ | `app.js`: `saveBookmark`, `checkLastSession` |
+### 4.1 プロセス・検証トレーサビリティ
+
+| 開発フェーズ | 対応ドキュメント | 対応する検証フェーズ | テスト仕様書参照 |
+| :--- | :--- | :--- | :--- |
+| **要求定義 (URD)** | [REQ-01-user_requirements.md](/docs/REQ-01-user_requirements.md) | **受入検証** | `MNG-05` Section 1 (UR-TC) |
+| **要件定義 (SRD)** | [REQ-03-system_requirements.md](/docs/REQ-03-system_requirements.md) | **システム検証** | `MNG-05` Section 2 (SRD-TC) |
+| **基本設計 (HLD)** | [DSN-01-high_level_design.md](/docs/DSN-01-high_level_design.md) | **結合検証** | `MNG-05` Section 3 (HLD-TC) |
+| **詳細設計 (LLD)** | [DSN-02-low_level_design.md](/docs/DSN-02-low_level_design.md) | **単体検証** | `MNG-05` Section 4 (LLD-TC) |
+| **実装 (Make)** | [index.html](/index.html), [app.js](/src/js/app.js)等 | **コーディングセルフチェック** | `MNG-05` Section 5 (MAKE-TC) |
+
+### 4.2 機能トレーサビリティマトリクス
+
+| ユーザー要求 (URD) | システム要件 (SRD) | 基本設計 (HLD) | 詳細設計 (LLD) | 実装コード | 主たる対応検証フェーズ |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **ファイル読み込み** | **3.1 ファイル読み込み要件** | 2.2 データフローシーケンス | 1. 状態変数<br>2.1 デコード処理 | `app.js`: `handleFile`, `FileReader` | 単体・システム・受入検証 |
+| **青空文庫記法パース** | **3.2 パース機能要件** | 4. セキュリティ設計 | 2.1 パース正規表現、実体エスケープ | `app.js`: `parseAozoraText` | 単体・システム・受入検証 |
+| **縦書き読書体験** | **3.3 ビューアー機能要件** | 3.1 縦書き・マルチカラム構成 | 3. ページ計算・送り計算 | `index.html`: `reader-content`<br>`app.js`: `nextPage`, `prevPage` | 単体・結合・受入検証 |
+| **表示カスタマイズ** | **3.4 カスタマイズ要件** | 3.2 テーマ定義<br>3.3/3.4 スタイル構成 | 5. CSS変数<br>5.2 クラス定義 | `style.css`: テーマクラス<br>`app.js`: `syncButtonState` | 結合・システム・受入検証 |
+| **しおり・状態保持** | **3.5 しおり機能要件** | 1.2 Storageの役割定義 | 4. LocalStorageスキーマ | `app.js`: `saveBookmark`, `checkLastSession` | 単体・システム・受入検証 |
