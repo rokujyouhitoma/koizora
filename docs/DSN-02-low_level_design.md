@@ -307,14 +307,14 @@ $$\text{scrollLeft} \leftarrow \begin{cases} -(\text{bookmarkProgress} \times \t
 
 #### 垂直方向の上寄せ配置 (上寄せアライメント)
 * **原因**: 縦書き表示時に `.reader-viewport` がフレックスコンテナ（`display: flex`）である場合、アラインメント制御（`align-items: flex-start` 等）を導入すると、ブラウザのフレックスボックス解釈により子要素 `.reader-content` の高さがコンテンツ最小バランス高（`height: auto` 相当）に縮小されてしまうバグが発生します。また、親要素に `padding` を設定して `height: 100%` を子要素に与えると、ブラウザがスクロールバーやパディングを誤って計算し、テキスト下部が画面外（ビューポート外）に押し端に描画される問題が生じます。
-* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウトに変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの上下余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。左右の余白をスクロール動作中も含めて完全に静的でかつ均等な幅に保つため、コンテナ自体の `left` および `right` に対し `var(--reader-padding-x)` を適用して画面の左右から内側に引き込み、コンテナ内部の padding は `0` にリセットしたうえで、安全余白パディングは子要素 `.reader-content` 側で持たせます。
+* **対策**: `.reader-viewport` からフレックスレイアウト（`display: flex`, `justify-content`, `align-items`）を完全に撤廃し、絶対配置レイアウトに変更します。さらに、ヘッダー/フッターを絶対配置のオーバーレイ形式とし、読書用コンテンツの上下余白をCSS変数（`--reader-padding-top`, `--reader-padding-bottom`）として定義します。コンテナ自体の `left` に対し `var(--reader-padding-x)` を適用して画面の左側から内側に引き込みつつ、右側は `0` として画面ぎりぎりまで広げ、コンテナ内部の padding は `0` にリセットしたうえで、安全余白パディングは子要素 `.reader-content` 側で持たせます。
   ```css
   .reader-viewport {
       position: absolute;
       top: 0;
       bottom: 0;
       left: var(--reader-padding-x);
-      right: var(--reader-padding-x);
+      right: 0;
       z-index: 1;
       padding: 0;
   }
